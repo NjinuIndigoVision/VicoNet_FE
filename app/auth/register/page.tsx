@@ -20,6 +20,14 @@ import { useForm } from "react-hook-form";
 import { ArrowLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
+import { useDispatch, useSelector } from "react-redux";
+import { getPersonnel, setPersonnel } from "../../../lib/personnelSlice";
+import { IPersonnel } from "@/lib/interfaces/personnel";
+
+
+
+
+
 const formSchema = z.object({
   email: z.string().email({
     message: INVALID_EMAIL_MESSAGE,
@@ -32,6 +40,30 @@ const formSchema = z.object({
 });
 
 export default function Register() {
+
+  const dispatch = useDispatch();
+
+  //BEGIN STORE
+  const _personnelFromState: any = useSelector(getPersonnel).personnel;
+  const addToWorkExperience = () => {
+    const workExperience0 =  {
+      "employer": "XYZ Corporation",
+      "jobTitle": "Junior Developer",
+      "startDate": "2019-01-01",
+      "endDate": "2021-12-31"
+    };
+
+    dispatch(setPersonnel({
+      _id:"01",
+      information:"info",
+      currentJob:workExperience0,
+      previousWorkExperience:[..._personnelFromState?.previousWorkExperience, workExperience0]
+     }as IPersonnel));
+
+  }
+
+  //END STORE
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
   }
@@ -43,6 +75,8 @@ export default function Register() {
       password: "",
     },
   });
+
+
   return (
     <div className="w-96 h-screen">
       <div className="w-96 text-sm flex flex-row justify-between my-16">
@@ -53,6 +87,17 @@ export default function Register() {
       </div>
       <div className="m-14">
         <p className="text-center font-bold text-2xl">Create an account</p>
+        <>
+      <h2>
+        PersonnelFromStore 
+       Id: {_personnelFromState?._id}<br/>
+        Info: {_personnelFromState?.information}<br/>
+        Work Exp: {_personnelFromState.previousWorkExperience?.length}
+      </h2>
+      <button value="Add" type="button" onClick={addToWorkExperience}>
+        Add
+      </button>
+    </>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
