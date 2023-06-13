@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Api } from "@/lib/api/endpoints";
 import { IUserLoginModel } from "@/lib/interfaces/user";
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -31,11 +32,16 @@ const formSchema = z.object({
 });
 
 export default function Login() {
-
+  const router = useRouter();
  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("val ", values);
    const response = await Api.POST_Login({email: values.email, password:values.password} as IUserLoginModel);
     console.log("response", response )
+    if(response.error){
+      //failed
+    }else{
+      router.push("/some-destination");
+    }
   }
 
   const saveCV=(e:any)=>{
@@ -69,7 +75,7 @@ export default function Login() {
           </Link>
         </div>
         <div>
-          <Link className="text-teal-700" href={"/auth/register"}>
+          <Link className="text-teal-700" href="/auth/register">
             Create an account.
           </Link>
         </div>

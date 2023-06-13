@@ -59,7 +59,7 @@ export async function POST(endPoint: string, payload: Object) {
       headers: header,
     });
     Diagnostic("SUCCESS ON POST, returning", result);
-    return result.data;
+    return result;
   } catch (error:any) {
     console.log(`[API ERROR : Method: POST; Endpoint: ${endPoint}]`, error);
     Diagnostic("ERROR ON POST, returning", error);
