@@ -19,6 +19,9 @@ import { INVALID_EMAIL_MESSAGE } from "@/constants";
 import { useForm } from "react-hook-form";
 import { ArrowLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Api } from "@/lib/api/endpoints";
+import { IUserLoginModel } from "@/lib/interfaces/user";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -28,8 +31,18 @@ const formSchema = z.object({
 });
 
 export default function Login() {
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+
+ async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("val ", values);
+   const response = await Api.POST_Login({email:"testemail@gmail.com", password:"testpasser"} as IUserLoginModel);
+    console.log("response", response )
+
+  }
+
+  const saveCV=(e:any)=>{
+ 
+    setCV(e.target.files[0]);
+   console.log(cv);
   }
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,6 +52,14 @@ export default function Login() {
       password: "",
     },
   });
+
+
+  //forms
+  const formData = new FormData();
+  const [cv, setCV] = useState<Blob|undefined>();
+  if(cv) formData.append("cv", cv as Blob);
+
+  
   return (
     <div className="w-auto h-screen">
       <div className="w-96 text-sm flex flex-row justify-between my-16">
@@ -85,9 +106,13 @@ export default function Login() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit">Login</Button>
         </form>
       </Form>
+{/* 
+      <form>
+      <input style={{marginBottom:"2%"}} className="form-control" type="file" id="cv" name="cv" onChange={saveCV} />
+      </form> */}
     </div>
   );
 }
