@@ -25,7 +25,9 @@ import { getPersonnel, setPersonnel } from "../../../lib/personnelSlice";
 import { IPersonnel } from "@/lib/interfaces/personnel";
 import { Api } from "@/lib/api/endpoints";
 import { IUserRegisterModel } from "@/lib/interfaces/user";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/navigation';
 
 
 
@@ -44,7 +46,7 @@ const formSchema = z.object({
 export default function Register() {
 
   const dispatch = useDispatch();
-
+  const router = useRouter();
   //BEGIN STORE
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
   const addToWorkExperience = () => {
@@ -67,7 +69,17 @@ export default function Register() {
   //END STORE
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+
+    const _id = toast.loading("Registering user..", {
+      position: "top-center",
+      autoClose: 100,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
     const payload = {
       title:"Mr",
       firstName: values.names,
@@ -79,8 +91,15 @@ export default function Register() {
     } as IUserRegisterModel;
     console.log("Ref", payload)
     const response = await Api.POST_Register(payload);
+    if(response?.error){
+      toast.update(_id, { render: "An error occured when registering user, please try again", type: "error", isLoading: false,autoClose: 2000  });
+    }else{
+    toast.update(_id, { render: `Registered ${response.data?.firstName} successfully, you may now login`, type: "success", isLoading: false,autoClose: 2000  });
+    router.push("/auth/login");
+    }
     
   }
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,6 +112,7 @@ export default function Register() {
 
   return (
     <div className="w-96 h-screen">
+      <ToastContainer />
       <div className="w-96 text-sm flex flex-row justify-between my-16">
         <div className="flex flex-row justify-around items-center">
           <ArrowLeft />

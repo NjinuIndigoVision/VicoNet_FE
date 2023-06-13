@@ -41,7 +41,14 @@ export const Api = {
     payload: IUserRegisterModel
   ): Promise<IResponseObject<IUserResponseModel>> => {
     const response = await POST(`${url}/users`, payload);
-    return response;
+    const _response =  {
+      error: response.statusText!="OK",
+      message:response.statusText,
+      data: response.data,
+      status:response.status
+    } as IResponseObject<IUserResponseModel>
+    
+    return _response;
   }
 
 };
