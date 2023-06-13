@@ -34,9 +34,8 @@ export default function Login() {
 
  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("val ", values);
-   const response = await Api.POST_Login({email:"testemail@gmail.com", password:"testpasser"} as IUserLoginModel);
+   const response = await Api.POST_Login({email: values.email, password:values.password} as IUserLoginModel);
     console.log("response", response )
-
   }
 
   const saveCV=(e:any)=>{

@@ -23,6 +23,8 @@ import { Label } from "@/components/ui/label";
 import { useDispatch, useSelector } from "react-redux";
 import { getPersonnel, setPersonnel } from "../../../lib/personnelSlice";
 import { IPersonnel } from "@/lib/interfaces/personnel";
+import { Api } from "@/lib/api/endpoints";
+import { IUserRegisterModel } from "@/lib/interfaces/user";
 
 
 
@@ -64,8 +66,20 @@ export default function Register() {
 
   //END STORE
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
+    const payload = {
+      title:"Mr",
+      firstName: values.names,
+      surname: values.surname,
+      email: values.email,
+      mobileNumber: values.mobileNumber,
+      password: values.password,
+      type:0
+    } as IUserRegisterModel;
+    console.log("Ref", payload)
+    const response = await Api.POST_Register(payload);
+    
   }
 
   const form = useForm<z.infer<typeof formSchema>>({

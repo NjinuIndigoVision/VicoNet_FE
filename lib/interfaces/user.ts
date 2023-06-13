@@ -15,9 +15,10 @@ export interface IUserLoginModel{
 }
 
 export interface IUserRegisterModel{
-  fullName: string;
+  firstName: string;
   surname:string;
   email:string;
   mobileNumber:string;
   password:string;
+  type:number;
 }
