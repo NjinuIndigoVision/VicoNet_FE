@@ -23,6 +23,8 @@ import { useState } from "react";
 import { Api } from "@/lib/api/endpoints";
 import { IUserLoginModel } from "@/lib/interfaces/user";
 import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -32,15 +34,29 @@ const formSchema = z.object({
 });
 
 export default function Login() {
+
+
   const router = useRouter();
  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const _id = toast.loading("Logging in..", {
+    position: "top-center",
+    autoClose: 100,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    });
     console.log("val ", values);
    const response = await Api.POST_Login({email: values.email, password:values.password} as IUserLoginModel);
     console.log("response", response )
     if(response.error){
+      toast.update(_id, { render: "Cannot log user in with supplied credentials", type: "error", isLoading: false, autoClose: 2000  });
       //failed
     }else{
       router.push("/some-destination");
+      toast.update(_id, { render: "Logged in successfully", type: "success", isLoading: false,autoClose: 2000  });
     }
   }
 
@@ -66,7 +82,9 @@ export default function Login() {
 
   
   return (
+    
     <div className="w-auto h-screen">
+       <ToastContainer />
       <div className="w-96 text-sm flex flex-row justify-between my-16">
         <div className="flex flex-row justify-around items-center">
           <ArrowLeft />
