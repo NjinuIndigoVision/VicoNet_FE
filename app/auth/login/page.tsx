@@ -22,9 +22,9 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Api } from "@/lib/api/endpoints";
 import { IUserLoginModel } from "@/lib/interfaces/user";
-import { useRouter } from 'next/navigation';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -34,37 +34,47 @@ const formSchema = z.object({
 });
 
 export default function Login() {
-
-
   const router = useRouter();
- async function onSubmit(values: z.infer<typeof formSchema>) {
-  const _id = toast.loading("Logging in..", {
-    position: "top-center",
-    autoClose: 100,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const _id = toast.loading("Logging in..", {
+      position: "top-center",
+      autoClose: 100,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
     });
     console.log("val ", values);
-   const response = await Api.POST_Login({email: values.email, password:values.password} as IUserLoginModel);
-    console.log("response", response )
-    if(response.error){
-      toast.update(_id, { render: "Cannot log user in with supplied credentials", type: "error", isLoading: false, autoClose: 2000  });
+    const response = await Api.POST_Login({
+      email: values.email,
+      password: values.password,
+    } as IUserLoginModel);
+    console.log("response", response);
+    if (response.error) {
+      toast.update(_id, {
+        render: "Cannot log user in with supplied credentials",
+        type: "error",
+        isLoading: false,
+        autoClose: 2000,
+      });
       //failed
-    }else{
-      router.push("/some-destination");
-      toast.update(_id, { render: "Logged in successfully", type: "success", isLoading: false,autoClose: 2000  });
+    } else {
+      router.replace("/protected/createProfile/about");
+      toast.update(_id, {
+        render: "Logged in successfully",
+        type: "success",
+        isLoading: false,
+        autoClose: 2000,
+      });
     }
   }
 
-  const saveCV=(e:any)=>{
- 
+  const saveCV = (e: any) => {
     setCV(e.target.files[0]);
-   console.log(cv);
-  }
+    console.log(cv);
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,17 +84,14 @@ export default function Login() {
     },
   });
 
-
   //forms
   const formData = new FormData();
-  const [cv, setCV] = useState<Blob|undefined>();
-  if(cv) formData.append("cv", cv as Blob);
+  const [cv, setCV] = useState<Blob | undefined>();
+  if (cv) formData.append("cv", cv as Blob);
 
-  
   return (
-    
     <div className="w-auto h-screen">
-       <ToastContainer />
+      <ToastContainer />
       <div className="w-96 text-sm flex flex-row justify-between my-16">
         <div className="flex flex-row justify-around items-center">
           <ArrowLeft />
@@ -132,7 +139,7 @@ export default function Login() {
           <Button type="submit">Login</Button>
         </form>
       </Form>
-{/* 
+      {/* 
       <form>
       <input style={{marginBottom:"2%"}} className="form-control" type="file" id="cv" name="cv" onChange={saveCV} />
       </form> */}

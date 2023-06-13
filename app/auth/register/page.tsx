@@ -25,12 +25,9 @@ import { getPersonnel, setPersonnel } from "../../../lib/personnelSlice";
 import { IPersonnel } from "@/lib/interfaces/personnel";
 import { Api } from "@/lib/api/endpoints";
 import { IUserRegisterModel } from "@/lib/interfaces/user";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useRouter } from 'next/navigation';
-
-
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -44,32 +41,34 @@ const formSchema = z.object({
 });
 
 export default function Register() {
-
   const dispatch = useDispatch();
   const router = useRouter();
   //BEGIN STORE
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
   const addToWorkExperience = () => {
-    const workExperience0 =  {
-      "employer": "XYZ Corporation",
-      "jobTitle": "Junior Developer",
-      "startDate": "2019-01-01",
-      "endDate": "2021-12-31"
+    const workExperience0 = {
+      employer: "XYZ Corporation",
+      jobTitle: "Junior Developer",
+      startDate: "2019-01-01",
+      endDate: "2021-12-31",
     };
 
-    dispatch(setPersonnel({
-      _id:"01",
-      information:"info",
-      currentJob:workExperience0,
-      previousWorkExperience:[..._personnelFromState?.previousWorkExperience, workExperience0]
-     }as IPersonnel));
-
-  }
+    // dispatch(
+    //   setPersonnel({
+    //     _id: "01",
+    //     information: "info",
+    //     currentJob: workExperience0,
+    //     previousWorkExperience: [
+    //       ..._personnelFromState?.previousWorkExperience,
+    //       workExperience0,
+    //     ],
+    //   } as IPersonnel)
+    // );
+  };
 
   //END STORE
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-
     const _id = toast.loading("Registering user..", {
       position: "top-center",
       autoClose: 100,
@@ -79,27 +78,35 @@ export default function Register() {
       draggable: true,
       progress: undefined,
       theme: "light",
-      });
+    });
     const payload = {
-      title:"Mr",
+      title: "Mr",
       firstName: values.names,
       surname: values.surname,
       email: values.email,
       mobileNumber: values.mobileNumber,
       password: values.password,
-      type:0
+      type: 1,
     } as IUserRegisterModel;
-    console.log("Ref", payload)
+    console.log("Ref", payload);
     const response = await Api.POST_Register(payload);
-    if(response?.error){
-      toast.update(_id, { render: "An error occured when registering user, please try again", type: "error", isLoading: false,autoClose: 2000  });
-    }else{
-    toast.update(_id, { render: `Registered ${response.data?.firstName} successfully, you may now login`, type: "success", isLoading: false,autoClose: 2000  });
-    router.push("/auth/login");
+    if (response?.error) {
+      toast.update(_id, {
+        render: "An error occured when registering user, please try again",
+        type: "error",
+        isLoading: false,
+        autoClose: 2000,
+      });
+    } else {
+      toast.update(_id, {
+        render: `Registered ${response.data?.firstName} successfully, you may now login`,
+        type: "success",
+        isLoading: false,
+        autoClose: 2000,
+      });
+      router.push("/auth/login");
     }
-    
   }
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -108,7 +115,6 @@ export default function Register() {
       password: "",
     },
   });
-
 
   return (
     <div className="w-96 h-screen">
@@ -121,7 +127,7 @@ export default function Register() {
       </div>
       <div className="m-14">
         <p className="text-center font-bold text-2xl">Create an account</p>
-        <>
+        {/* <>
       <h2>
         PersonnelFromStore 
        Id: {_personnelFromState?._id}<br/>
@@ -131,7 +137,7 @@ export default function Register() {
       <button value="Add" type="button" onClick={addToWorkExperience}>
         Add
       </button>
-    </>
+    </> */}
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
