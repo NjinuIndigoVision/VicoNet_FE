@@ -25,9 +25,14 @@ import { getPersonnel, setPersonnel } from "../../../lib/personnelSlice";
 import { IPersonnel } from "@/lib/interfaces/personnel";
 import { Api } from "@/lib/api/endpoints";
 import { IUserRegisterModel } from "@/lib/interfaces/user";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/navigation';
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+import { useState } from "react";
+
+
 
 const formSchema = z.object({
   email: z.string().email({
@@ -41,6 +46,7 @@ const formSchema = z.object({
 });
 
 export default function Register() {
+  const [mobile, setMobile] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
   //BEGIN STORE
@@ -69,6 +75,8 @@ export default function Register() {
   //END STORE
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+
+    console.log("Ref", values);
     const _id = toast.loading("Registering user..", {
       position: "top-center",
       autoClose: 100,
@@ -78,7 +86,8 @@ export default function Register() {
       draggable: true,
       progress: undefined,
       theme: "light",
-    });
+      });
+
     const payload = {
       title: "Mr",
       firstName: values.names,
@@ -88,7 +97,9 @@ export default function Register() {
       password: values.password,
       type: 1,
     } as IUserRegisterModel;
-    console.log("Ref", payload);
+    
+   
+    
     const response = await Api.POST_Register(payload);
     if (response?.error) {
       toast.update(_id, {
@@ -99,12 +110,12 @@ export default function Register() {
       });
     } else {
       toast.update(_id, {
-        render: `Registered ${response.data?.firstName} successfully, you may now login`,
+        render: `Registered ${response.data?.firstName} successfully, an OTP has been sent to: ${response.data?.email}`,
         type: "success",
         isLoading: false,
         autoClose: 2000,
       });
-      router.push("/auth/login");
+      router.push(`/auth/otp?email=${response.data?.email}`);
     }
   }
 
@@ -189,11 +200,20 @@ export default function Register() {
                   <FormLabel>Mobile Number</FormLabel>
                   <FormControl>
                     <Input placeholder="Mobile Number" {...field} />
+                    {/* <PhoneInput
+                    inputStyle={{backgroundColor:"transparent",width:"100%", borderColor: "#e5e7eb"}}
+                    inputClass="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      country={'za'}
+                      value={mobile}
+                      onChange={phone => { setMobile(phone)}}
+                      placeholder="+27 123-4567"
+                    /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="password"

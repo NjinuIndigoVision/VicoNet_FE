@@ -64,7 +64,7 @@ function Experience() {
   };
   return (
     <>
-      <p className="text-lg font-bold">Have you worked before?</p>
+      <p className="text-lg font-bold">Do you have previous work experience?</p>
       <div className="flex items-center space-x-2 my-5">
         <Checkbox
           checked={isWorking}
@@ -75,7 +75,7 @@ function Experience() {
           htmlFor="works"
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
-          Yes, I have
+          Yes, I do
         </label>
       </div>
 

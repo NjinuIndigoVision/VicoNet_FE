@@ -25,6 +25,8 @@ import { IUserLoginModel } from "@/lib/interfaces/user";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { _addPersonnel } from "@/lib/personnelService";
+import { IPersonnel, IPersonnelRequestModel } from "@/lib/interfaces/personnel";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -69,6 +71,7 @@ export default function Login() {
         isLoading: false,
         autoClose: 2000,
       });
+      router.replace("/protected/createProfile/about");
     }
   }
 
@@ -86,9 +89,52 @@ export default function Login() {
   });
 
   //forms
-  const formData = new FormData();
   const [cv, setCV] = useState<Blob | undefined>();
-  if (cv) formData.append("cv", cv as Blob);
+
+  async function addPersonnel() {
+    const personnel = {
+      _id: "12345",
+      searchKeys: "developer",
+      information: "Lorem ipsum dolor sit amet",
+      currentJob: {
+        employer: "ABC Company",
+        jobTitle: "Software Engineer",
+        startDate: "2022-01-01",
+        endDate: "2022-12-31",
+      },
+      previousWorkExperience: [
+        {
+          employer: "XYZ Company",
+          jobTitle: "Web Developer",
+          startDate: "2020-01-01",
+          endDate: "2021-12-31",
+        },
+      ],
+      yearsOfExperience: "3",
+      education: {
+        instituteName: "University of ABC",
+        qualification: "Bachelor of Science",
+        dateCompleted: "2019-12-31",
+      },
+      keySkills: "C#, JavaScript, HTML, CSS",
+      keyCourses: "Introduction to Machine Learning",
+      cvUrl: "https://example.com/cv",
+      personalInformation: {
+        profile: "https://example.com/profile",
+        name: "John",
+        surname: "Doe",
+        dateOfBirth: "1990-01-01",
+        cellPhone: "1234567890",
+        address: "123 Main Street",
+        country: "USA",
+        province: "California",
+      },
+      _user: "user123",
+      cv: cv,
+    } as IPersonnelRequestModel;
+
+    _addPersonnel(personnel);
+  }
 
   return (
     <div className="w-auto h-screen">
@@ -140,10 +186,22 @@ export default function Login() {
           <Button type="submit">Login</Button>
         </form>
       </Form>
-      {/* 
       <form>
-      <input style={{marginBottom:"2%"}} className="form-control" type="file" id="cv" name="cv" onChange={saveCV} />
-      </form> */}
+        <input
+          style={{ marginBottom: "2%" }}
+          className="form-control"
+          type="file"
+          id="cv"
+          name="cv"
+          onChange={saveCV}
+        />
+      </form>
+      <input
+        type="submit"
+        onClick={() => {
+          addPersonnel();
+        }}
+      />
     </div>
   );
 }

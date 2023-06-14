@@ -79,3 +79,10 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+.otp-button {
+  float:left !important;
+  width:15% !important;
+  height:50px !important;
+  margin:2%
+}
