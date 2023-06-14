@@ -14,6 +14,11 @@ export interface IUserLoginModel{
  password:string; 
 }
 
+export interface IActivateAccount{
+  email:string;
+  otp:string; 
+ }
+
 export interface IUserRegisterModel{
   firstName: string;
   surname:string;

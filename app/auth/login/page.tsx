@@ -63,13 +63,14 @@ export default function Login() {
       });
       //failed
     } else {
-      router.replace("/protected/createProfile/about");
+     
       toast.update(_id, {
         render: "Logged in successfully",
         type: "success",
         isLoading: false,
         autoClose: 2000,
-      });
+      }); 
+      router.replace("/protected/createProfile/about");
     }
   }
 

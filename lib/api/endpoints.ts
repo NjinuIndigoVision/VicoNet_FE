@@ -1,5 +1,5 @@
 import { IPersonnel } from "../interfaces/personnel";
-import { IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
+import { IActivateAccount, IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
@@ -30,6 +30,19 @@ export const Api = {
     payload: IUserLoginModel
   ): Promise<IResponseObject<IUserResponseModel>> => {
     const response = await POST(`${url}/login`, payload);
+    const _response = {
+      error: response.statusText != "OK",
+      message: response.statusText,
+      data: response.data,
+      status: response.status,
+    } as IResponseObject<IUserResponseModel>;
+
+    return _response;
+  },
+  POST_ActivateOTP: async (
+    payload: IActivateAccount
+  ): Promise<IResponseObject<IUserResponseModel>> => {
+    const response = await POST(`${url}/users/verify`, payload);
     const _response = {
       error: response.statusText != "OK",
       message: response.statusText,

@@ -93,7 +93,7 @@ export default function Register() {
       firstName: values.names,
       surname: values.surname,
       email: values.email,
-      mobileNumber: mobile,
+      mobileNumber: values.mobileNumber,
       password: values.password,
       type: 1,
     } as IUserRegisterModel;
@@ -110,12 +110,12 @@ export default function Register() {
       });
     } else {
       toast.update(_id, {
-        render: `Registered ${response.data?.firstName} successfully, you may now login`,
+        render: `Registered ${response.data?.firstName} successfully, an OTP has been sent to: ${response.data?.email}`,
         type: "success",
         isLoading: false,
         autoClose: 2000,
       });
-      router.push("/auth/login");
+      router.push(`/auth/otp?email=${response.data?.email}`);
     }
   }
 
