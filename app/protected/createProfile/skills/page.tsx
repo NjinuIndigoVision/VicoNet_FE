@@ -2,58 +2,92 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { IPersonnel } from "@/lib/interfaces/personnel";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
+import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
 
 function Skills() {
   const [skill, setSkill] = useState("");
   const [course, setCourse] = useState("");
   const [courses, setCourses] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
-
+  const dispatch = useDispatch();
   const router = useRouter();
 
   useEffect(() => {
-    loadData();
+    _loadData();
   }, []);
 
-  const save = async () => {
-    await localStorage.setItem("skills", JSON.stringify(skills));
-    await localStorage.setItem("courses", JSON.stringify(courses));
+  // const save = async () => {
+  //   await localStorage.setItem("skills", JSON.stringify(skills));
+  //   await localStorage.setItem("courses", JSON.stringify(courses));
+  //   router.push("/protected/createProfile/workModel");
+  // };
+
+  // const loadData = async () => {
+  //   const skls = await localStorage.getItem("skills");
+  //   const crs = await localStorage.getItem("courses");
+
+  //   if (skls) {
+  //     const s: string[] = JSON.parse(skls);
+  //     setSkills(s);
+  //   }
+
+  //   if (crs) {
+  //     const c: string[] = JSON.parse(crs);
+  //     setCourses(c);
+  //   }
+  // };
+  const _personnelFromState: any = useSelector(getPersonnel).personnel;
+
+  const _loadData = async () => {
+    
+    const data = await localStorage.getItem("currentPersonnel");
+
+    if (data!=undefined) {
+      const personnel: IPersonnel = JSON.parse(data);
+      console.log("erson", personnel)
+      setSkills(personnel.keySkills??[]);
+      setCourses(personnel.keyCourses??[])
+    
+    }
+  };
+
+  const addPageDetailsToState = async () => {
+    const payload = 
+    {
+      ..._personnelFromState,
+      keySkills:skills,
+      keyCourses: courses     
+
+     } as IPersonnel
+
+    dispatch(
+      setPersonnel(payload)
+    );
+    await localStorage.setItem(
+      "currentPersonnel",
+      JSON.stringify(payload)
+    );
     router.push("/protected/createProfile/workModel");
   };
 
-  const loadData = async () => {
-    const skls = await localStorage.getItem("skills");
-    const crs = await localStorage.getItem("courses");
-
-    if (skls) {
-      const s: string[] = JSON.parse(skls);
-      setSkills(s);
-    }
-
-    if (crs) {
-      const c: string[] = JSON.parse(crs);
-      setCourses(c);
-    }
-  };
+  
 
   const addSkill = () => {
-    let temp = skills;
-    temp.push(skill);
-    setSkills(temp);
+    setSkills([...skills, skill]);
     setSkill("");
   };
 
   const addCourse = () => {
-    let temp = courses;
-    temp.push(course);
-    setCourses(temp);
+    setCourses([...courses, course])
     setCourse("");
   };
 
   const removeSkill = (idx: number) => {
-    let temp = skills;
+    const temp = skills;
     temp.splice(idx, 1);
     setSkills(temp);
   };
@@ -123,7 +157,7 @@ function Skills() {
         <Button className="mt-5" onClick={() => router.back()}>
           Back
         </Button>
-        <Button className="mt-5" onClick={save}>
+        <Button className="mt-5" onClick={addPageDetailsToState}>
           Save & Continue
         </Button>
       </div>

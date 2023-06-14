@@ -10,18 +10,19 @@ export interface PersonnelState {
 // ## Define the initial state of Cart State 
 const initialState: PersonnelState = {
     personnel:{
-        _id:"",
+        // _id:"",
         searchKeys:"",
-        information:"",
+        // information:{},
         currentJob: {},
         previousWorkExperience:[],
         yearsOfExperience:"",
-        education:{},
-        keySkills: "",
-        keyCourses:"",
+        education:[],
+        keySkills: [],
+        keyCourses:[],
         cvUrl:"",
         personalInformation:{},
         _user:"",
+        state:0
     }
 };
 

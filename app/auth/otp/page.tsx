@@ -129,7 +129,7 @@ export default function Register() {
         isLoading: false,
         autoClose: 2000,
       }); 
-      router.push("/protected/createProfile/about");
+      router.push("/auth/login");
     }else{
       toast.update(_id, {
         render: "Incorrect OTP",

@@ -9,71 +9,105 @@ import {
 } from "@/lib/interfaces/personnel";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
 
 function WorkModel() {
-  const [fullTime, setFullTime] = useState(false);
-  const [partTime, setPartTime] = useState(false);
-  const [remote, setRemote] = useState(false);
+  const [workType, setWorkType] = useState(0);
   const router = useRouter();
 
+  
+  const _personnelFromState: any = useSelector(getPersonnel).personnel;
+  const dispatch = useDispatch();
   const save = async () => {
-    let personel: IPersonnel = {};
-    let jobInfoData = await localStorage.getItem("jobInformation");
-    let educationData = await localStorage.getItem("education");
-    let previousJobsData = await localStorage.getItem("previousJobs");
-    let skillsData = await localStorage.getItem("skills");
-    let coursesData = await localStorage.getItem("courses");
-    let userData = await localStorage.getItem("user");
+    // let personel: IPersonnel = {};
+    // let jobInfoData = await localStorage.getItem("jobInformation");
+    // let educationData = await localStorage.getItem("education");
+    // let previousJobsData = await localStorage.getItem("previousJobs");
+    // let skillsData = await localStorage.getItem("skills");
+    // let coursesData = await localStorage.getItem("courses");
+    // let userData = await localStorage.getItem("user");
 
-    if (userData) {
-      const user = JSON.parse(userData);
+    // if (userData) {
+    //   const user = JSON.parse(userData);
 
-      let info: IPersonalInformation = {
-        name: user.firstName,
-        surname: user.surname,
-        _id: user._id,
-        cellPhone: user.cellPhone,
-      };
+    //   let info: IPersonalInformation = {
+    //     name: user.firstName,
+    //     surname: user.surname,
+    //     _id: user._id,
+    //     cellPhone: user.cellPhone,
+    //   };
 
-      personel.personalInformation = info;
-    }
+    //   personel.personalInformation = info;
+    // }
 
-    if (jobInfoData) {
-      const jobInfo: IJobInformation = JSON.parse(jobInfoData);
-      personel.currentJob = jobInfo;
-    }
+    // if (jobInfoData) {
+    //   const jobInfo: IJobInformation = JSON.parse(jobInfoData);
+    //   personel.currentJob = jobInfo;
+    // }
 
-    if (educationData) {
-      const educationInfo: IEducationInformation[] = JSON.parse(educationData);
-      personel.education = educationInfo;
-    }
+    // if (educationData) {
+    //   const educationInfo: IEducationInformation[] = JSON.parse(educationData);
+    //   personel.education = educationInfo;
+    // }
 
-    if (previousJobsData) {
-      const prevJobs: IJobInformation[] = JSON.parse(previousJobsData);
-      personel.previousWorkExperience = prevJobs;
-    }
+    // if (previousJobsData) {
+    //   const prevJobs: IJobInformation[] = JSON.parse(previousJobsData);
+    //   personel.previousWorkExperience = prevJobs;
+    // }
 
-    if (coursesData) {
-      const courses: string[] = JSON.parse(coursesData);
-      personel.keyCourses = courses;
-    }
+    // if (coursesData) {
+    //   const courses: string[] = JSON.parse(coursesData);
+    //   personel.keyCourses = courses;
+    // }
 
-    if (skillsData) {
-      const skills: string[] = JSON.parse(skillsData);
-      personel.keySkills = skills;
-    }
+    // if (skillsData) {
+    //   const skills: string[] = JSON.parse(skillsData);
+    //   personel.keySkills = skills;
+    // }
 
-    await localStorage.setItem("profile", JSON.stringify(personel));
+    // await localStorage.setItem("profile", JSON.stringify(personel));
 
     router.push("/protected/profile");
   };
+
+  const _loadData = async () => {
+    
+    const data = await localStorage.getItem("currentPersonnel");
+
+    if (data!=undefined) {
+      const personnel: IPersonnel = JSON.parse(data);
+
+      setWorkType(personnel.preferedWorkMethod??0);
+    }
+  };
+
+  const addPageDetailsToState = async () => {
+    const payload = 
+    {
+      ..._personnelFromState,
+     workType: workType
+
+     } as IPersonnel
+
+    dispatch(
+      setPersonnel(payload)
+    );
+   
+    await localStorage.setItem(
+      "currentPersonnel",
+      JSON.stringify(payload)
+    );
+    router.push("/protected/createProfile/education");
+  };
+
   return (
     <>
       <p className="text-lg font-bold">Preferred Working Method</p>
       <div className="flex items-center space-x-2 my-5">
         <Checkbox
-          checked={fullTime}
-          onCheckedChange={(e) => setFullTime((prev) => !prev)}
+          checked={workType==0}
+          onCheckedChange={(e) => setWorkType(0)}
           id="works"
         />
         <label
@@ -86,8 +120,8 @@ function WorkModel() {
 
       <div className="flex items-center space-x-2 my-5">
         <Checkbox
-          checked={partTime}
-          onCheckedChange={(e) => setPartTime((prev) => !prev)}
+          checked={workType ==1}
+          onCheckedChange={(e) => setWorkType(1)}
           id="works"
         />
         <label
@@ -100,8 +134,8 @@ function WorkModel() {
 
       <div className="flex items-center space-x-2 my-5">
         <Checkbox
-          checked={remote}
-          onCheckedChange={(e) => setRemote((prev) => !prev)}
+          checked={workType==2}
+          onCheckedChange={(e) => setWorkType(2)}
           id="works"
         />
         <label

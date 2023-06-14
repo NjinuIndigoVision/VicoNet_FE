@@ -13,8 +13,11 @@ import {
 import React, { useState, useEffect } from "react";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { IJobInformation } from "@/lib/interfaces/personnel";
+import { IJobInformation, IPersonnel } from "@/lib/interfaces/personnel";
 import { useRouter } from "next/navigation";
+
+import { useDispatch, useSelector } from "react-redux";
+import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
 
 function Experience() {
   const [isWorking, setIsWorking] = useState(false);
@@ -24,10 +27,13 @@ function Experience() {
   const [endDate, setEndDate] = useState<Date>();
   const [prevJobs, setPrevJobs] = useState<IJobInformation[]>([]);
   const router = useRouter();
-
+  const dispatch = useDispatch();
+  
   useEffect(() => {
-    loadData();
+    _loadData();
   }, []);
+
+  const _personnelFromState: any = useSelector(getPersonnel).personnel;
 
   const add = () => {
     const job: IJobInformation = {
@@ -37,9 +43,10 @@ function Experience() {
       endDate: endDate?.toString(),
     };
 
-    let prev: IJobInformation[] = prevJobs;
-    prev.push(job);
-    setPrevJobs(prev);
+    // let prev: IJobInformation[] = prevJobs;
+    // prev.push(job);
+    const _jobs = [...prevJobs, job]
+    setPrevJobs(_jobs);
   };
 
   const remove = (idx: number) => {
@@ -49,19 +56,53 @@ function Experience() {
     setPrevJobs(prev);
   };
 
-  const save = async () => {
-    await localStorage.setItem("previousJobs", JSON.stringify(prevJobs));
-    router.push("/protected/createProfile/skills");
-  };
+  // const save = async () => {
+  //   await localStorage.setItem("previousJobs", JSON.stringify(prevJobs));
+  //   router.push("/protected/createProfile/skills");
+  // };
 
-  const loadData = async () => {
-    const data = await localStorage.getItem("previousJobs");
+  // const loadData = async () => {
+  //   const data = await localStorage.getItem("previousJobs");
+
+  //   if (data) {
+  //     const jobs: IJobInformation[] = JSON.parse(data);
+  //     setPrevJobs(jobs);
+  //   }
+  // };
+
+   const _loadData = async () => {
+    const data = await localStorage.getItem("currentPersonnel");
 
     if (data) {
-      const jobs: IJobInformation[] = JSON.parse(data);
+      
+      const _personnel: IPersonnel = JSON.parse(data);
+
+      const jobs: IJobInformation[] = _personnel.previousWorkExperience??[];
+      jobs.length>1? setIsWorking(true):setIsWorking(false);
+  
       setPrevJobs(jobs);
     }
   };
+  console.log("RWRE", _personnelFromState)
+
+  const addPageDetailsToState = async () => {
+    const payload = 
+    {
+      ..._personnelFromState,
+      previousWorkExperience:prevJobs
+     } as IPersonnel
+
+    dispatch(
+      setPersonnel(payload)
+    );
+    await localStorage.setItem(
+      "currentPersonnel",
+      JSON.stringify(payload)
+    );
+    router.push("/protected/createProfile/skills");
+  };
+
+
   return (
     <>
       <p className="text-lg font-bold">Do you have previous work experience?</p>
@@ -186,7 +227,7 @@ function Experience() {
             <Button className="mt-5" onClick={() => router.back()}>
               Back
             </Button>
-            <Button className="mt-5" onClick={save}>
+            <Button className="mt-5" onClick={addPageDetailsToState}>
               Save & Continue
             </Button>
           </div>

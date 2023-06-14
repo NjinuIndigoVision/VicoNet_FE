@@ -52,6 +52,36 @@ export const Api = {
 
     return _response;
   },
+
+  POST_AddPersonnel: async (
+    payload: IPersonnel
+  ): Promise<IResponseObject<IPersonnel>> => {
+    const response = await POST(`${url}/personnel`, payload);
+    const _response = {
+      error: response.statusText != "OK",
+      message: response.statusText,
+      data: response.data,
+      status: response.status,
+    } as IResponseObject<IPersonnel>;
+
+    return _response;
+  },
+
+  GET_Personnel: async (
+    payload: string
+  ): Promise<IPersonnel> => {
+    const response = await GET(`${url}/personnel/${payload}`);
+    console.log("HIII",response)
+    const _response = {
+      error: response.statusText != "OK",
+      message: response.statusText,
+      data: response,
+      status: response.status,
+    } as IResponseObject<IPersonnel>;
+    
+    return response;
+  },
+
   POST_Register: async (
     payload: IUserRegisterModel
   ): Promise<IResponseObject<IUserResponseModel>> => {

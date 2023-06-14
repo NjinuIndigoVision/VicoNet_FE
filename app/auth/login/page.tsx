@@ -26,7 +26,6 @@ import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { _addPersonnel } from "@/lib/personnelService";
-import { IPersonnel, IPersonnelRequestModel } from "@/lib/interfaces/personnel";
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
@@ -59,7 +58,7 @@ async function Redirect(){
     theme: "light",
     });
   await delay(2000);
-  router.replace("/protected/createProfile/about");
+  router.replace("/protected/profile");
     
 }
 
@@ -220,7 +219,7 @@ async function Redirect(){
           <Button type="submit">Login</Button>
         </form>
       </Form>
-      <form>
+      {/* <form>
         <input
           style={{ marginBottom: "2%" }}
           className="form-control"
@@ -235,7 +234,7 @@ async function Redirect(){
         onClick={() => {
           addPersonnel();
         }}
-      />
+      /> */}
     </div>
   );
 }

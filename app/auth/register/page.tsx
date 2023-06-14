@@ -50,27 +50,6 @@ export default function Register() {
   const dispatch = useDispatch();
   const router = useRouter();
   //BEGIN STORE
-  const _personnelFromState: any = useSelector(getPersonnel).personnel;
-  const addToWorkExperience = () => {
-    const workExperience0 = {
-      employer: "XYZ Corporation",
-      jobTitle: "Junior Developer",
-      startDate: "2019-01-01",
-      endDate: "2021-12-31",
-    };
-
-    // dispatch(
-    //   setPersonnel({
-    //     _id: "01",
-    //     information: "info",
-    //     currentJob: workExperience0,
-    //     previousWorkExperience: [
-    //       ..._personnelFromState?.previousWorkExperience,
-    //       workExperience0,
-    //     ],
-    //   } as IPersonnel)
-    // );
-  };
 
   //END STORE
 

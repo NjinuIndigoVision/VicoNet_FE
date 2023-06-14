@@ -20,11 +20,16 @@ import React, { useState, useEffect } from "react";
 import {
   IJobInformation,
   IJobResponsibilities,
+  IPersonalInformation,
+  IPersonnel,
 } from "@/lib/interfaces/personnel";
 import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
 import { isLoggedIn } from "@/lib/loginCheck";
 import { ToastContainer, toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
+import Cookies from "universal-cookie";
 
 function About() {
   const [about, setAbout] = useState("");
@@ -40,8 +45,11 @@ function About() {
   const [responsibility, setResponsibility] = useState("");
   const router = useRouter();
 
+  const dispatch = useDispatch();
+  const cookies = new Cookies();
+  
   useEffect(() => {
-    loadData();
+    _loadData();
   }, []);
 
   const addResponsibility = () => {
@@ -65,10 +73,10 @@ function About() {
   const save = async () => {
     const jobInformation: IJobInformation = {
       employer: companyName,
-      about,
       jobTitle,
       startDate: date?.toString(),
       responsibilities: currentJobResponsibilities,
+
     };
 
     //API must match this 👇
@@ -81,26 +89,90 @@ function About() {
     router.push("/protected/createProfile/education");
   };
 
-  const loadData = async () => {
-    const data = await localStorage.getItem("jobInformation");
+  const _personnelFromState: any = useSelector(getPersonnel).personnel;
+  const loggedInUser = cookies.get('viconet-user') ;
+  // const loadData = async () => {
 
-    if (data) {
-      const jobInformation: IJobInformation = JSON.parse(data);
+  //   const data = await localStorage.getItem("jobInformation");
 
-      setAbout(jobInformation.about!);
+  //   if (data) {
+  //     const jobInformation: IJobInformation = JSON.parse(data);
 
-      if (jobInformation.employer != "") {
+  //     setAbout(jobInformation.about!);
+      
+
+  //     if (jobInformation.employer != "") {
+  //       setIsWorking(true);
+  //       setCompanyName(jobInformation.employer!);
+  //       setCurrentJobResponsibilities(jobInformation.responsibilities!);
+  //       setJobTitle(jobInformation.jobTitle!);
+  //     }
+  //   }
+  // };
+
+
+  const _loadData = async () => {
+    
+    const data = await localStorage.getItem("currentPersonnel");
+
+    if (data!=undefined) {
+      const personnel: IPersonnel = JSON.parse(data);
+
+      setAbout(personnel?.personalInformation?.about!);
+      
+
+      if (personnel.currentJob?.employer != undefined) {
         setIsWorking(true);
-        setCompanyName(jobInformation.employer!);
-        setCurrentJobResponsibilities(jobInformation.responsibilities!);
-        setJobTitle(jobInformation.jobTitle!);
+        setCompanyName(personnel.currentJob.employer!);
+        setCurrentJobResponsibilities(personnel.currentJob.responsibilities!);
+        setJobTitle(personnel.currentJob.jobTitle!);
+        // setDate(Date(personnel.currentJob.startDate!))//TODO: NK fix this 
       }
     }
   };
 
+
   if(!isLoggedIn()){
     router.push("/auth/login");
   }
+
+  //STORE
+
+
+  const addPageDetailsToState = async () => {
+    const payload = 
+    {
+      ..._personnelFromState,
+      personalInformation:{
+       name: loggedInUser?.name,
+       about: about,
+       surname: loggedInUser?.surname,
+       dateOfBirth:"", //TODO: set this
+       address:"", //TODO: set this
+       country:country,
+       province:province
+      } as IPersonalInformation,
+      currentJob:{
+       employer: companyName,
+       jobTitle,
+       startDate: date?.toString(),
+       responsibilities: currentJobResponsibilities,
+ 
+     } as IJobInformation
+
+     } as IPersonnel
+
+    dispatch(
+      setPersonnel(payload)
+    );
+    await localStorage.setItem(
+      "currentPersonnel",
+      JSON.stringify(payload)
+    );
+    router.push("/protected/createProfile/education");
+  };
+
+  //STORE
   
   return (
     <>    
@@ -231,7 +303,7 @@ function About() {
         </>
       )}
 
-      <Button className="mt-5" onClick={save}>
+      <Button className="mt-5" onClick={addPageDetailsToState}>
         Save & Continue
       </Button>
     </>

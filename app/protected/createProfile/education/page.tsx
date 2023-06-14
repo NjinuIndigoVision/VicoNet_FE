@@ -3,9 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IEducationInformation } from "@/lib/interfaces/personnel";
+import { IEducationInformation, IPersonnel } from "@/lib/interfaces/personnel";
+import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
 
 export type EducationItemProp = {
   id: number;
@@ -18,57 +21,70 @@ function Educastion() {
   const [yearCompleted, setYearCompleted] = useState("");
   const [education, setEducation] = useState<IEducationInformation[]>([]);
   const router = useRouter();
-
+  const dispatch = useDispatch();
+  
   useEffect(() => {
-    loadData();
+    _loadData();
   }, []);
 
-  const loadData = async () => {
-    const data = await localStorage.getItem("education");
+  // const loadData = async () => {
+  //   const data = await localStorage.getItem("education");
 
-    if (data) {
-      const ed: IEducationInformation[] = JSON.parse(data);
-      setEducation(ed);
+  //   if (data) {
+  //     const ed: IEducationInformation[] = JSON.parse(data);
+  //     setEducation(ed);
+  //   }
+  // };
+  const _personnelFromState: any = useSelector(getPersonnel).personnel;
+
+  const _loadData = async()=>{
+    const data = await localStorage.getItem("currentPersonnel");
+
+    if (data!=undefined) {
+      const personnel: IPersonnel = JSON.parse(data);
+      
+      const savedEducation = personnel.education??[];
+      const _education = savedEducation as IEducationInformation[];
+      setEducation(_education)
     }
-  };
+  }
 
-  const save = async () => {
-    //API must match this 👇
-    console.log(education);
+  const addPageDetailsToState = async () => {
+    const payload = 
+    {
+      ..._personnelFromState,
+      education:education
+     } as IPersonnel
 
-    await localStorage.setItem("education", JSON.stringify(education));
+    dispatch(
+      setPersonnel(payload)
+    );
+
+
+    await localStorage.setItem(
+      "currentPersonnel",
+      JSON.stringify(payload)
+    );
     router.push("/protected/createProfile/experience");
   };
 
   const add = () => {
-    let temp: IEducationInformation[] = education;
-    temp.push({
-      dateCompleted: yearCompleted,
-      instituteName: institution,
-      qualification,
-    });
-    setEducation(temp);
+  const _education = [...education,{
+    dateCompleted: yearCompleted,
+    instituteName: institution,
+    qualification,
+  } ] 
+    // temp.push({
+    //   dateCompleted: yearCompleted,
+    //   instituteName: institution,
+    //   qualification,
+    // });
+    setEducation(_education);
   };
 
   const remove = (idx: number) => {
-    let temp = education;
-    temp = temp.splice(idx, 1);
-    setEducation(temp);
-  };
-
-  const EducationItem = (ed: EducationItemProp) => {
-    return (
-      <div className="flex flex-row justify-between my-5 w-full max-w-sm">
-        <div>
-          <p className="font-bold">{ed.education.instituteName}</p>
-          <p className="text-sm">{ed.education.qualification}</p>
-          <p className="text-sm">{ed.education.dateCompleted}</p>
-        </div>
-        <Button className="mt-5" onClick={() => remove(ed.id)}>
-          Remove
-        </Button>
-      </div>
-    );
+    const removed = education.splice(idx,1);
+    setEducation(removed);
   };
 
   return (
@@ -110,7 +126,7 @@ function Educastion() {
         Add Education
       </Button>
 
-      {education.map((item, idx) => (
+      {education && education.map((item, idx) => (
         <div
           key={item.dateCompleted}
           className="flex flex-row justify-between my-5 w-full max-w-sm"
@@ -130,7 +146,7 @@ function Educastion() {
         <Button className="mt-5" onClick={() => router.back()}>
           Back
         </Button>
-        <Button className="mt-5" onClick={save}>
+        <Button className="mt-5" onClick={addPageDetailsToState}>
           Save & Continue
         </Button>
       </div>
