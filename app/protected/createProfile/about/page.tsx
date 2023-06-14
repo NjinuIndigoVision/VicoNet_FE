@@ -28,6 +28,8 @@ import { ToastContainer, toast } from "react-toastify";
 
 function About() {
   const [about, setAbout] = useState("");
+  const [country, setCountry] = useState("South Africa");
+  const [province, setProvince] = useState("KwaZulu-Natal");
   const [isWorking, setIsWorking] = useState(false);
   const [companyName, setCompanyName] = useState<string>("");
   const [jobTitle, setJobTitle] = useState<string>("");
@@ -111,6 +113,28 @@ function About() {
         placeholder="Tell us a little bit about your work experience"
         className="resize-none"
       />
+
+      <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
+        <Label htmlFor="name">Country</Label>
+        <Input
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          type="text"
+          id="name"
+          placeholder="Country"
+        />
+      </div>
+
+      <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
+        <Label htmlFor="name">Province</Label>
+        <Input
+          value={province}
+          onChange={(e) => setProvince(e.target.value)}
+          type="text"
+          id="name"
+          placeholder="Province"
+        />
+      </div>
 
       <div className="flex items-center space-x-2 my-5">
         <Checkbox

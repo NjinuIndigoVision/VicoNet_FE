@@ -22,9 +22,9 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Api } from "@/lib/api/endpoints";
 import { IUserLoginModel } from "@/lib/interfaces/user";
-import { useRouter } from 'next/navigation';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { _addPersonnel } from "@/lib/personnelService";
 import { IPersonnel, IPersonnelRequestModel } from "@/lib/interfaces/personnel";
 import Cookies from 'universal-cookie';
@@ -93,12 +93,14 @@ async function Redirect(){
     } else {
        cookies.set('viconet-user', response?.data as any, { path: '/' });
 
+      await localStorage.setItem("user", JSON.stringify(response.data));
+      router.replace("/protected/createProfile/about");
       toast.update(_id, {
         render: "Logged in successfully",
         type: "success",
         isLoading: false,
         autoClose: 2000,
-      }); 
+      });
       router.replace("/protected/createProfile/about");
     }
   }
@@ -117,53 +119,51 @@ async function Redirect(){
   });
 
   //forms
-  const [cv, setCV] = useState<Blob|undefined>();
+  const [cv, setCV] = useState<Blob | undefined>();
 
-  async function addPersonnel(){
-    
-   const personnel = {
-      _id: "12345",
-      searchKeys: "developer",
-      information: "Lorem ipsum dolor sit amet",
-      currentJob: {
-        employer: "ABC Company",
-        jobTitle: "Software Engineer",
-        startDate: "2022-01-01",
-        endDate: "2022-12-31"
-      },
-      previousWorkExperience: [
-        {
-          employer: "XYZ Company",
-          jobTitle: "Web Developer",
-          startDate: "2020-01-01",
-          endDate: "2021-12-31"
-        }
-      ],
-      yearsOfExperience: "3",
-      education: {
-        instituteName: "University of ABC",
-        qualification: "Bachelor of Science",
-        dateCompleted: "2019-12-31"
-      },
-      keySkills: "C#, JavaScript, HTML, CSS",
-      keyCourses: "Introduction to Machine Learning",
-      cvUrl: "https://example.com/cv",
-      personalInformation: {
-        profile: "https://example.com/profile",
-        name: "John",
-        surname: "Doe",
-        dateOfBirth: "1990-01-01",
-        cellPhone: "1234567890",
-        address: "123 Main Street",
-        country: "USA",
-        province: "California"
-      },
-      _user: "user123",
-      cv:cv
-    } as IPersonnelRequestModel;
-    
-    _addPersonnel(personnel)
+  async function addPersonnel() {
+    // const personnel = {
+    //   _id: "12345",
+    //   searchKeys: "developer",
+    //   information: "Lorem ipsum dolor sit amet",
+    //   currentJob: {
+    //     employer: "ABC Company",
+    //     jobTitle: "Software Engineer",
+    //     startDate: "2022-01-01",
+    //     endDate: "2022-12-31",
+    //   },
+    //   previousWorkExperience: [
+    //     {
+    //       employer: "XYZ Company",
+    //       jobTitle: "Web Developer",
+    //       startDate: "2020-01-01",
+    //       endDate: "2021-12-31",
+    //     },
+    //   ],
+    //   yearsOfExperience: "3",
+    //   education: {
+    //     instituteName: "University of ABC",
+    //     qualification: "Bachelor of Science",
+    //     dateCompleted: "2019-12-31",
+    //   },
+    //   keySkills: "C#, JavaScript, HTML, CSS",
+    //   keyCourses: "Introduction to Machine Learning",
+    //   cvUrl: "https://example.com/cv",
+    //   personalInformation: {
+    //     profile: "https://example.com/profile",
+    //     name: "John",
+    //     surname: "Doe",
+    //     dateOfBirth: "1990-01-01",
+    //     cellPhone: "1234567890",
+    //     address: "123 Main Street",
+    //     country: "USA",
+    //     province: "California",
+    //   },
+    //   _user: "user123",
+    //   cv: cv,
+    // } as IPersonnelRequestModel;
 
+    // _addPersonnel(personnel);
   }
   
   if(isLoggedIn){ 
@@ -221,9 +221,21 @@ async function Redirect(){
         </form>
       </Form>
       <form>
-      <input style={{marginBottom:"2%"}} className="form-control" type="file" id="cv" name="cv" onChange={saveCV} />
+        <input
+          style={{ marginBottom: "2%" }}
+          className="form-control"
+          type="file"
+          id="cv"
+          name="cv"
+          onChange={saveCV}
+        />
       </form>
-      <input type="submit" onClick={()=>{addPersonnel()}}/>
+      <input
+        type="submit"
+        onClick={() => {
+          addPersonnel();
+        }}
+      />
     </div>
   );
 }

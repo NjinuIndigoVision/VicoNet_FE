@@ -11,13 +11,14 @@ export interface IPersonalDetails {
 
 export interface IPersonalInformation {
   profile?: string;
-  name?: string;
-  surname?: string;
+  name: string;
+  surname: string;
   dateOfBirth?: string;
   cellPhone?: string;
   address?: string;
   country?: string;
   province?: string;
+  _id: string;
 }
 
 export interface IJobResponsibilities {
@@ -45,9 +46,9 @@ export interface IPersonnel {
   currentJob?: IJobInformation;
   previousWorkExperience?: IJobInformation[];
   yearsOfExperience?: string;
-  education?: IEducationInformation;
-  keySkills?: string;
-  keyCourses?: string;
+  education?: IEducationInformation[];
+  keySkills?: string[];
+  keyCourses?: string[];
   cvUrl?: string;
   personalInformation?: IPersonalInformation;
   _user?: string;
