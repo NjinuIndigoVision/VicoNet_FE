@@ -165,11 +165,9 @@ async function Redirect(){
     _addPersonnel(personnel)
 
   }
-
-
+  
   if(isLoggedIn){ 
     Redirect();
-   
    }
 
   return (

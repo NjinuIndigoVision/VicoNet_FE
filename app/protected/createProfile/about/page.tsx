@@ -23,6 +23,8 @@ import {
 } from "@/lib/interfaces/personnel";
 import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
+import { isLoggedIn } from "@/lib/loginCheck";
+import { ToastContainer, toast } from "react-toastify";
 
 function About() {
   const [about, setAbout] = useState("");
@@ -94,8 +96,13 @@ function About() {
     }
   };
 
+  if(!isLoggedIn()){
+    router.push("/auth/login");
+  }
+  
   return (
-    <>
+    <>    
+    {isLoggedIn() && <>
       <p className="text-lg font-bold">About Yourself</p>
       <p className="text-xs text-gray-500 mb-5">Maximun characters is 700</p>
       <Textarea
@@ -204,6 +211,9 @@ function About() {
         Save & Continue
       </Button>
     </>
+    }
+    </>
+
   );
 }
 
