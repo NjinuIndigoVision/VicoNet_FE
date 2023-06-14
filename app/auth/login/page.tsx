@@ -27,6 +27,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { _addPersonnel } from "@/lib/personnelService";
 import { IPersonnel, IPersonnelRequestModel } from "@/lib/interfaces/personnel";
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
+const isLoggedIn = cookies.get('viconet-user') ;
+
+const delay = (ms:any) => new Promise(res => setTimeout(res, ms));
 
 const formSchema = z.object({
   email: z.string().email({
@@ -36,8 +43,29 @@ const formSchema = z.object({
 });
 
 export default function Login() {
+
   const router = useRouter();
+  
+  
+async function Redirect(){
+  toast(`Welcome back ${isLoggedIn.firstName}`, {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    });
+  await delay(2000);
+  router.replace("/protected/createProfile/about");
+    
+}
+
+  
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    
     const _id = toast.loading("Logging in..", {
       position: "top-center",
       autoClose: 100,
@@ -48,12 +76,12 @@ export default function Login() {
       progress: undefined,
       theme: "light",
     });
-    console.log("val ", values);
+    
     const response = await Api.POST_Login({
       email: values.email,
       password: values.password,
     } as IUserLoginModel);
-    console.log("response", response);
+
     if (response.error) {
       toast.update(_id, {
         render: "Cannot log user in with supplied credentials",
@@ -61,9 +89,10 @@ export default function Login() {
         isLoading: false,
         autoClose: 2000,
       });
-      //failed
+ 
     } else {
-     
+       cookies.set('viconet-user', response?.data as any, { path: '/' });
+
       toast.update(_id, {
         render: "Logged in successfully",
         type: "success",
@@ -138,6 +167,10 @@ export default function Login() {
   }
 
 
+  if(isLoggedIn){ 
+    Redirect();
+   
+   }
 
   return (
     <div className="w-auto h-screen">
