@@ -1,14 +1,13 @@
-import {
-  IUserLoginModel,
-  IUserRegisterModel,
-  IUserResponseModel,
-} from "../interfaces/user";
+import { IPersonnel } from "../interfaces/personnel";
+import { IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
 
+
 const url = "http://localhost:8080/api";
 // const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
+
 
 export const Api = {
   Base: url,
@@ -48,9 +47,22 @@ export const Api = {
       error: response.statusText != "OK",
       message: response.statusText,
       data: response.data,
-      status: response.status,
-    } as IResponseObject<IUserResponseModel>;
-
+      status:response.status
+    } as IResponseObject<IUserResponseModel>
+    
     return _response;
   },
+  POST_Personnel: async (
+    payload: IPersonnel
+  ): Promise<IResponseObject<IPersonnel>> => {
+    const response = await POST(`${url}/personnel`, payload);
+    const _response =  {
+      error: response.statusText!="OK",
+      message:response.statusText,
+      data: response.data,
+      status:response.status
+    } as IResponseObject<IPersonnel>
+    
+    return _response;
+  }
 };
