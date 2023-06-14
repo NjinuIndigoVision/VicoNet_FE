@@ -61,6 +61,7 @@ export default function Login() {
       });
       //failed
     } else {
+      await localStorage.setItem("user", JSON.stringify(response.data));
       router.replace("/protected/createProfile/about");
       toast.update(_id, {
         render: "Logged in successfully",
