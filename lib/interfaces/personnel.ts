@@ -41,3 +41,7 @@ export interface IPersonnel {
   preferedWorkMethod?:number;
   
 }
+
+export interface IPersonnelRequestModel extends IPersonnel{
+  cv: Blob;
+}

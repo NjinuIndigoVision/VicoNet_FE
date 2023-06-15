@@ -3,6 +3,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Api } from "@/lib/api/endpoints";
 import { IPersonnel } from "@/lib/interfaces/personnel";
 import { IUserResponseModel } from "@/lib/interfaces/user";
+import { uploadCV } from "@/lib/personnelService";
+import { setPersonnel } from "@/lib/personnelSlice";
 import { BriefcaseIcon, Calendar, Edit, NetworkIcon, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
@@ -25,11 +27,21 @@ function page() {
   const moment = require('moment');
   const loggedInUser = cookies.get('viconet-user') as IUserResponseModel ;
   const addPersonnel = async function(){
+    const cvPayload = new FormData();
+    // cvPayload.append("cv", cv);  
+    if(cv) {cvPayload.append("cv", cv as Blob);
+    const cvDoc  = await uploadCV(cvPayload);
+    const path = cvDoc.data.data.Location;
     
-    const payload = {...user, _user:loggedInUser._id } as IPersonnel;
+    const payload = {...user, _user:loggedInUser._id, cvUrl:path} as IPersonnel;
+    console.log("cvassaa", payload);
     const response = await Api.POST_AddPersonnel(payload);
-
-    console.log("fullpay",payload);
+    setPersonnel(response);
+    }else{
+      const payload = {...user, _user:loggedInUser._id} as IPersonnel;
+      console.log("cvassaa", payload);
+      const response = await Api.POST_AddPersonnel(payload);
+    }
 
   }
   const getPersonnel = async function(){
@@ -65,7 +77,7 @@ function page() {
         <Avatar className="w-32 h-32">
           <AvatarFallback className="text-lg font-bold">
             {loggedInUser?.firstName?.substring(0, 1) +
-      loggedInUser.surname?.substring(0, 1)!}
+      loggedInUser?.surname?.substring(0, 1)!}
           </AvatarFallback>
         </Avatar>
         {user && (
@@ -205,14 +217,11 @@ function page() {
               <Edit className="cursor-pointer" />
             </div>
             <div className="flex flex-row mt-5 justify-between">
+         
+             
               <div>
                 <p className="text-lg font-bold">CV</p>
                 <p className="mt-2 text-gray-700 text-sm">
-                <button>Download CV</button>
-                <button style={{float:"right"}}>Upload Video CV</button>
-                </p>
-              </div>
-              {/* <form>
                 <input
                   style={{ marginBottom: "2%" }}
                   className="form-control"
@@ -221,13 +230,14 @@ function page() {
                   name="cv"
                   onChange={saveCV}
                 />
-                <input
-                type="submit"
-                // onClick={() => {
-                //   addPersonnel();
-                // }}
-              />
-            </form> */}
+                <br/>
+                {user.cvUrl!="" && <a href={user.cvUrl} target="_blank">Download CV</a>}
+                  {/* <button >Download CV</button> */}
+                  {/* <button style={{float:"right"}}>Upload Video CV</button> */}
+                </p>
+              </div>
+       
+          
              <input
                 type="submit"
                 onClick={() => {

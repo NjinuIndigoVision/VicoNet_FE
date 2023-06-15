@@ -2,21 +2,14 @@ import axios from "axios";
 import { IPersonnel, IPersonnelRequestModel } from "./interfaces/personnel";
 import { Api } from "./api/endpoints";
 
-export function uploadCV(formData: FormData){
+export async function uploadCV(formData: FormData){
 
     const config = {     
         headers: { 'content-type': 'multipart/form-data',  "Access-Control-Allow-Origin": "*"},
         
     }
-    axios.post("http://localhost:8080/api/upload_cv/1", formData, config)
-    .then((response:any) => {
-        console.log("response", response);      
-        
-    })
-    .catch((error:any) => {
-
-        console.log(error);
-    });
+   const resp = await axios.post("http://localhost:8080/api/upload_cv/1", formData, config)
+   return resp;
 
 
 }
