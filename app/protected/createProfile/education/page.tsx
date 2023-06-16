@@ -22,7 +22,7 @@ function Educastion() {
   const [education, setEducation] = useState<IEducationInformation[]>([]);
   const router = useRouter();
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     _loadData();
   }, []);
@@ -37,54 +37,57 @@ function Educastion() {
   // };
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
 
-  const _loadData = async()=>{
+  const _loadData = async () => {
     const data = await localStorage.getItem("currentPersonnel");
 
-    if (data!=undefined) {
+    if (data != undefined) {
       const personnel: IPersonnel = JSON.parse(data);
-      
-      const savedEducation = personnel.education??[];
+
+      const savedEducation = personnel.education ?? [];
       const _education = savedEducation as IEducationInformation[];
-      setEducation(_education)
+      setEducation(_education);
     }
-  }
+  };
 
   const addPageDetailsToState = async () => {
-    const payload = 
-    {
+    const payload = {
       ..._personnelFromState,
-      education:education
-     } as IPersonnel
+      education: education,
+    } as IPersonnel;
 
-    dispatch(
-      setPersonnel(payload)
-    );
+    dispatch(setPersonnel(payload));
 
-
-    await localStorage.setItem(
-      "currentPersonnel",
-      JSON.stringify(payload)
-    );
+    await localStorage.setItem("currentPersonnel", JSON.stringify(payload));
     router.push("/protected/createProfile/experience");
   };
 
   const add = () => {
-  const _education = [...education,{
-    dateCompleted: yearCompleted,
-    instituteName: institution,
-    qualification,
-  } ] 
+    // const _education = [...education,{
+    //   dateCompleted: yearCompleted,
+    //   instituteName: institution,
+    //   qualification,
+    // } ]
     // temp.push({
     //   dateCompleted: yearCompleted,
     //   instituteName: institution,
     //   qualification,
     // });
-    setEducation(_education);
+    setEducation((current) => [
+      ...current,
+      {
+        dateCompleted: yearCompleted,
+        instituteName: institution,
+        qualification,
+      },
+    ]);
+
+    setYearCompleted("");
+    setInstitution("");
+    setQualification("");
   };
 
   const remove = (idx: number) => {
-    const removed = education.splice(idx,1);
-    setEducation(removed);
+    setEducation((current) => current.filter((_, i) => i !== idx));
   };
 
   return (
@@ -126,21 +129,22 @@ function Educastion() {
         Add Education
       </Button>
 
-      {education && education.map((item, idx) => (
-        <div
-          key={item.dateCompleted}
-          className="flex flex-row justify-between my-5 w-full max-w-sm"
-        >
-          <div>
-            <p className="font-bold">{item.instituteName}</p>
-            <p className="text-sm">{item.qualification}</p>
-            <p className="text-sm">{item.dateCompleted}</p>
+      {education &&
+        education.map((item, idx) => (
+          <div
+            key={item.dateCompleted}
+            className="flex flex-row justify-between my-5 w-full max-w-sm"
+          >
+            <div>
+              <p className="font-bold">{item.instituteName}</p>
+              <p className="text-sm">{item.qualification}</p>
+              <p className="text-sm">{item.dateCompleted}</p>
+            </div>
+            <Button className="mt-5" onClick={() => remove(idx)}>
+              Remove
+            </Button>
           </div>
-          <Button className="mt-5" onClick={() => remove(idx)}>
-            Remove
-          </Button>
-        </div>
-      ))}
+        ))}
 
       <div className="flex flex-row space-x-4">
         <Button className="mt-5" onClick={() => router.back()}>

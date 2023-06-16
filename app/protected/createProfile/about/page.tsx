@@ -47,27 +47,25 @@ function About() {
 
   const dispatch = useDispatch();
   const cookies = new Cookies();
-  
+
   useEffect(() => {
     _loadData();
   }, []);
 
   const addResponsibility = () => {
     if (responsibility != "") {
-      let tempResp = currentJobResponsibilities;
-      tempResp.push({
-        content: responsibility,
-      });
-      setCurrentJobResponsibilities(tempResp);
+      setCurrentJobResponsibilities((current) => [
+        ...current,
+        { content: responsibility },
+      ]);
       setResponsibility("");
     }
   };
 
   const removeResponsibility = (idx: number) => {
-    console.log("remove", idx);
-    let tempResp = currentJobResponsibilities;
-    tempResp = tempResp.splice(idx, 1);
-    setCurrentJobResponsibilities(tempResp);
+    setCurrentJobResponsibilities((current) =>
+      current.filter((_, i) => i !== idx)
+    );
   };
 
   const save = async () => {
@@ -76,7 +74,6 @@ function About() {
       jobTitle,
       startDate: date?.toString(),
       responsibilities: currentJobResponsibilities,
-
     };
 
     //API must match this 👇
@@ -90,7 +87,7 @@ function About() {
   };
 
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
-  const loggedInUser = cookies.get('viconet-user') ;
+  const loggedInUser = cookies.get("viconet-user");
   // const loadData = async () => {
 
   //   const data = await localStorage.getItem("jobInformation");
@@ -99,7 +96,6 @@ function About() {
   //     const jobInformation: IJobInformation = JSON.parse(data);
 
   //     setAbout(jobInformation.about!);
-      
 
   //     if (jobInformation.employer != "") {
   //       setIsWorking(true);
@@ -110,206 +106,197 @@ function About() {
   //   }
   // };
 
-
   const _loadData = async () => {
-    
     const data = await localStorage.getItem("currentPersonnel");
 
-    if (data!=undefined) {
+    if (data != undefined) {
       const personnel: IPersonnel = JSON.parse(data);
 
       setAbout(personnel?.personalInformation?.about!);
-      
 
       if (personnel.currentJob?.employer != undefined) {
         setIsWorking(true);
         setCompanyName(personnel.currentJob.employer!);
         setCurrentJobResponsibilities(personnel.currentJob.responsibilities!);
         setJobTitle(personnel.currentJob.jobTitle!);
-        // setDate(Date(personnel.currentJob.startDate!))//TODO: NK fix this 
+        // setDate(Date(personnel.currentJob.startDate!))//TODO: NK fix this
       }
     }
   };
 
-
-  if(!isLoggedIn()){
+  if (!isLoggedIn()) {
     router.push("/auth/login");
   }
 
   //STORE
 
-
   const addPageDetailsToState = async () => {
-    const payload = 
-    {
+    const payload = {
       ..._personnelFromState,
-      personalInformation:{
-       name: loggedInUser?.name,
-       about: about,
-       surname: loggedInUser?.surname,
-       dateOfBirth:"", //TODO: set this
-       address:"", //TODO: set this
-       country:country,
-       province:province
+      personalInformation: {
+        name: loggedInUser?.name,
+        about: about,
+        surname: loggedInUser?.surname,
+        dateOfBirth: "", //TODO: set this
+        address: "", //TODO: set this
+        country: country,
+        province: province,
       } as IPersonalInformation,
-      currentJob:{
-       employer: companyName,
-       jobTitle,
-       startDate: date?.toString(),
-       responsibilities: currentJobResponsibilities,
- 
-     } as IJobInformation
+      currentJob: {
+        employer: companyName,
+        jobTitle,
+        startDate: date?.toString(),
+        responsibilities: currentJobResponsibilities,
+      } as IJobInformation,
+    } as IPersonnel;
 
-     } as IPersonnel
-
-    dispatch(
-      setPersonnel(payload)
-    );
-    await localStorage.setItem(
-      "currentPersonnel",
-      JSON.stringify(payload)
-    );
+    dispatch(setPersonnel(payload));
+    await localStorage.setItem("currentPersonnel", JSON.stringify(payload));
     router.push("/protected/createProfile/education");
   };
 
   //STORE
-  
+
   return (
-    <>    
-    {isLoggedIn() && <>
-      <p className="text-lg font-bold">About Yourself</p>
-      <p className="text-xs text-gray-500 mb-5">Maximun characters is 700</p>
-      <Textarea
-        value={about}
-        onChange={(e) => setAbout(e.target.value)}
-        placeholder="Tell us a little bit about your work experience"
-        className="resize-none"
-      />
-
-      <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
-        <Label htmlFor="name">Country</Label>
-        <Input
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          type="text"
-          id="name"
-          placeholder="Country"
-        />
-      </div>
-
-      <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
-        <Label htmlFor="name">Province</Label>
-        <Input
-          value={province}
-          onChange={(e) => setProvince(e.target.value)}
-          type="text"
-          id="name"
-          placeholder="Province"
-        />
-      </div>
-
-      <div className="flex items-center space-x-2 my-5">
-        <Checkbox
-          checked={isWorking}
-          onCheckedChange={(e) => setIsWorking((prev) => !prev)}
-          id="works"
-        />
-        <label
-          htmlFor="works"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          I am currently working
-        </label>
-      </div>
-
-      {isWorking && (
+    <>
+      {isLoggedIn() && (
         <>
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="name">Company Name</Label>
+          <p className="text-lg font-bold">About Yourself</p>
+          <p className="text-xs text-gray-500 mb-5">
+            Maximun characters is 700
+          </p>
+          <Textarea
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+            placeholder="Tell us a little bit about your work experience"
+            className="resize-none"
+          />
+
+          <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
+            <Label htmlFor="name">Country</Label>
             <Input
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
               type="text"
               id="name"
-              placeholder="Company Name"
+              placeholder="Country"
             />
           </div>
 
           <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
-            <Label>Start Date</Label>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
-            <Label htmlFor="name">Job Title</Label>
+            <Label htmlFor="name">Province</Label>
             <Input
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
+              value={province}
+              onChange={(e) => setProvince(e.target.value)}
               type="text"
               id="name"
-              placeholder="Job Title"
+              placeholder="Province"
             />
           </div>
 
-          <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
-            <Label htmlFor="name">Role and Responsibility</Label>
-            <div className="flex flex-row justify-center space-x-2">
-              <div className="flex-1">
+          <div className="flex items-center space-x-2 my-5">
+            <Checkbox
+              checked={isWorking}
+              onCheckedChange={(e) => setIsWorking((prev) => !prev)}
+              id="works"
+            />
+            <label
+              htmlFor="works"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              I am currently working
+            </label>
+          </div>
+
+          {isWorking && (
+            <>
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label htmlFor="name">Company Name</Label>
                 <Input
-                  value={responsibility}
-                  onChange={(e) => setResponsibility(e.target.value)}
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
                   type="text"
                   id="name"
-                  placeholder="Role and Responsibility"
+                  placeholder="Company Name"
                 />
               </div>
-              <div className="">
-                <Button onClick={addResponsibility}>Add</Button>
-              </div>
-            </div>
-          </div>
 
-          {currentJobResponsibilities.map((item, idx) => (
-            <div
-              key={idx}
-              className="flex flex-row justify-between my-5 w-full max-w-sm "
-            >
-              <p>{item.content}</p>
-              <Button onClick={() => removeResponsibility(idx)}>Remove</Button>
-            </div>
-          ))}
+              <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
+                <Label>Start Date</Label>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
+                <Label htmlFor="name">Job Title</Label>
+                <Input
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  type="text"
+                  id="name"
+                  placeholder="Job Title"
+                />
+              </div>
+
+              <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
+                <Label htmlFor="name">Role and Responsibility</Label>
+                <div className="flex flex-row justify-center space-x-2">
+                  <div className="flex-1">
+                    <Input
+                      value={responsibility}
+                      onChange={(e) => setResponsibility(e.target.value)}
+                      type="text"
+                      id="name"
+                      placeholder="Role and Responsibility"
+                    />
+                  </div>
+                  <div className="">
+                    <Button onClick={addResponsibility}>Add</Button>
+                  </div>
+                </div>
+              </div>
+
+              {currentJobResponsibilities.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-row justify-between my-5 w-full max-w-sm "
+                >
+                  <p>{item.content}</p>
+                  <Button onClick={() => removeResponsibility(idx)}>
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </>
+          )}
+
+          <Button className="mt-5" onClick={addPageDetailsToState}>
+            Save & Continue
+          </Button>
         </>
       )}
-
-      <Button className="mt-5" onClick={addPageDetailsToState}>
-        Save & Continue
-      </Button>
     </>
-    }
-    </>
-
   );
 }
 

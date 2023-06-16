@@ -28,7 +28,7 @@ function Experience() {
   const [prevJobs, setPrevJobs] = useState<IJobInformation[]>([]);
   const router = useRouter();
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     _loadData();
   }, []);
@@ -36,24 +36,24 @@ function Experience() {
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
 
   const add = () => {
+    const _startDateSplit = startDate!.toString().split(" ");
+    const _endDateSplit = endDate!.toString().split(" ");
+
     const job: IJobInformation = {
       employer: companyName,
       jobTitle,
-      startDate: startDate?.toString(),
-      endDate: endDate?.toString(),
+      startDate: `${_startDateSplit[1]} ${_startDateSplit[2]} ${_startDateSplit[3]}`,
+      endDate: `${_endDateSplit[1]} ${_endDateSplit[2]} ${_endDateSplit[3]}`,
     };
 
     // let prev: IJobInformation[] = prevJobs;
     // prev.push(job);
-    const _jobs = [...prevJobs, job]
+    const _jobs = [...prevJobs, job];
     setPrevJobs(_jobs);
   };
 
   const remove = (idx: number) => {
-    let prev: IJobInformation[] = prevJobs;
-    prev = prev.splice(idx, 1);
-
-    setPrevJobs(prev);
+    setPrevJobs((current) => current.filter((_, i) => i !== idx));
   };
 
   // const save = async () => {
@@ -70,38 +70,30 @@ function Experience() {
   //   }
   // };
 
-   const _loadData = async () => {
+  const _loadData = async () => {
     const data = await localStorage.getItem("currentPersonnel");
 
     if (data) {
-      
       const _personnel: IPersonnel = JSON.parse(data);
 
-      const jobs: IJobInformation[] = _personnel.previousWorkExperience??[];
-      jobs.length>1? setIsWorking(true):setIsWorking(false);
-  
+      const jobs: IJobInformation[] = _personnel.previousWorkExperience ?? [];
+      jobs.length > 1 ? setIsWorking(true) : setIsWorking(false);
+
       setPrevJobs(jobs);
     }
   };
-  console.log("RWRE", _personnelFromState)
+  console.log("RWRE", _personnelFromState);
 
   const addPageDetailsToState = async () => {
-    const payload = 
-    {
+    const payload = {
       ..._personnelFromState,
-      previousWorkExperience:prevJobs
-     } as IPersonnel
+      previousWorkExperience: prevJobs,
+    } as IPersonnel;
 
-    dispatch(
-      setPersonnel(payload)
-    );
-    await localStorage.setItem(
-      "currentPersonnel",
-      JSON.stringify(payload)
-    );
+    dispatch(setPersonnel(payload));
+    await localStorage.setItem("currentPersonnel", JSON.stringify(payload));
     router.push("/protected/createProfile/skills");
   };
-
 
   return (
     <>

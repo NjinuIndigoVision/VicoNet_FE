@@ -1,11 +1,32 @@
 "use client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Api } from "@/lib/api/endpoints";
 import { IPersonnel } from "@/lib/interfaces/personnel";
 import { IUserResponseModel } from "@/lib/interfaces/user";
 import { uploadCV } from "@/lib/personnelService";
 import { setPersonnel } from "@/lib/personnelSlice";
-import { BriefcaseIcon, Calendar, Edit, NetworkIcon, User } from "lucide-react";
+import {
+  BriefcaseIcon,
+  Calendar,
+  CalendarIcon,
+  Edit,
+  NetworkIcon,
+  User,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
 
@@ -24,33 +45,36 @@ function page() {
   };
 
   const cookies = new Cookies();
-  const moment = require('moment');
-  const loggedInUser = cookies.get('viconet-user') as IUserResponseModel ;
-  const addPersonnel = async function(){
+  const moment = require("moment");
+  const loggedInUser = cookies.get("viconet-user") as IUserResponseModel;
+  const addPersonnel = async function () {
     const cvPayload = new FormData();
-    // cvPayload.append("cv", cv);  
-    if(cv) {cvPayload.append("cv", cv as Blob);
-    const cvDoc  = await uploadCV(cvPayload);
-    const path = cvDoc.data.data.Location;
-    
-    const payload = {...user, _user:loggedInUser._id, cvUrl:path} as IPersonnel;
-    console.log("cvassaa", payload);
-    const response = await Api.POST_AddPersonnel(payload);
-    setPersonnel(response);
-    }else{
-      const payload = {...user, _user:loggedInUser._id} as IPersonnel;
+    // cvPayload.append("cv", cv);
+    if (cv) {
+      cvPayload.append("cv", cv as Blob);
+      const cvDoc = await uploadCV(cvPayload);
+      const path = cvDoc.data.data.Location;
+
+      const payload = {
+        ...user,
+        _user: loggedInUser._id,
+        cvUrl: path,
+      } as IPersonnel;
+      console.log("cvassaa", payload);
+      const response = await Api.POST_AddPersonnel(payload);
+      setPersonnel(response);
+    } else {
+      const payload = { ...user, _user: loggedInUser._id } as IPersonnel;
       console.log("cvassaa", payload);
       const response = await Api.POST_AddPersonnel(payload);
     }
-
-  }
-  const getPersonnel = async function(){
-    console.log("USER", loggedInUser)
-      const response = await Api.GET_Personnel(loggedInUser._id??"");
-      console.log("DSSDS", response)
-      return response as IPersonnel;
-  }
-
+  };
+  const getPersonnel = async function () {
+    console.log("USER", loggedInUser);
+    const response = await Api.GET_Personnel(loggedInUser._id ?? "");
+    console.log("DSSDS", response);
+    return response as IPersonnel;
+  };
 
   const getUser = async () => {
     //We'll replace this with an API call, also need to make this a SSR component
@@ -60,41 +84,42 @@ function page() {
       const usr: IPersonnel = JSON.parse(data);
       setUser(usr);
       const ini =
-      loggedInUser?.firstName?.substring(0, 1)??"" +
-      loggedInUser.surname?.substring(0, 1)!;
+        loggedInUser?.firstName?.substring(0, 1) ??
+        "" + loggedInUser.surname?.substring(0, 1)!;
       setInitials(ini);
-    }else{
-      var savedUser = await  getPersonnel();
+    } else {
+      var savedUser = await getPersonnel();
       console.log("saved.", savedUser);
       setUser(savedUser);
     }
-    
   };
 
   return (
     <div className="m-10 flex flex-row space-x-5">
-      <div className="p-10 border-gray-100 max-h-80 rounded-lg shadow-sm shadow-gray-300 flex flex-col items-center">
+      <div className="p-10 border-gray-100 h-fit rounded-lg shadow-sm shadow-gray-300 flex flex-col items-center">
         <Avatar className="w-32 h-32">
           <AvatarFallback className="text-lg font-bold">
             {loggedInUser?.firstName?.substring(0, 1) +
-      loggedInUser?.surname?.substring(0, 1)!}
+              loggedInUser?.surname?.substring(0, 1)!}
           </AvatarFallback>
         </Avatar>
         {user && (
           <>
             <div className="flex flex-row mt-2">
               <p className="text-lg font-bold">
-                {loggedInUser?.firstName}{" "}
-                {loggedInUser?.surname}
-              </p><br/>
-            
+                {loggedInUser?.firstName} {loggedInUser?.surname}
+              </p>
+              <br />
             </div>
-            <p>{loggedInUser.email}</p><br/>
-            <p> address..</p><br/>
-            <p>{user.personalInformation.province}, 
-            {user.personalInformation.country}</p>
+            <p>{loggedInUser.email}</p>
+            <br />
+            <p> address..</p>
+            <br />
+            <p>
+              {user.personalInformation.province},
+              {user.personalInformation.country}
+            </p>
           </>
-        
         )}
       </div>
 
@@ -108,49 +133,94 @@ function page() {
                   {user.personalInformation?.about}
                 </p>
               </div>
-              <Edit className="cursor-pointer" />
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Edit className="cursor-pointer" />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Edit Bio</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <Textarea
+                        placeholder="Tell us a little bit about your work experience"
+                        className="resize-none"
+                      />
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>Continue</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
 
             <div className="flex flex-row mt-10 justify-between">
               <div>
                 <p className="text-lg font-bold">
-                <BriefcaseIcon /> Current Role and Responsibilities
+                  <BriefcaseIcon /> Current Role and Responsibilities
                 </p>
                 <div className="flex flex-row mt-2 items-center">
-                  
                   <p className="mt-2 mx-5 text-gray-700 text-sm">
                     Company name: {user.currentJob?.employer}
                   </p>
-              
-                 
                 </div>
                 <div className="flex flex-row mt-2 items-center">
-                
                   <p className="mt-2 mx-5 text-gray-700 text-sm">
                     Job title: {user.currentJob?.jobTitle}
                   </p>
                 </div>
                 <div className="flex flex-row mt-2 items-center">
-                
                   <p className="mt-2 mx-5 text-gray-700 text-sm">
-                    Starting Date: {moment(user?.currentJob?.startDate).format('MMMM d, YYYY')} 
+                    Starting Date:{" "}
+                    {moment(user?.currentJob?.startDate).format("MMMM d, YYYY")}
                   </p>
                 </div>
-                <div className="flex flex-row mt-2 items-center">
-                
-                </div>
+                <div className="flex flex-row mt-2 items-center"></div>
               </div>
-              <Edit className="cursor-pointer" />
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Edit className="cursor-pointer" />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Edit Current Company</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label htmlFor="name">Company Name</Label>
+                        <Input
+                          type="text"
+                          id="name"
+                          placeholder="Company Name"
+                        />
+                      </div>
+
+                      <div className="grid w-full items-center mt-5 gap-1.5">
+                        <Label htmlFor="name">Start Date</Label>
+                        <Input type="text" id="name" placeholder="Start Date" />
+                      </div>
+
+                      <div className="grid w-full items-center mt-5 gap-1.5">
+                        <Label htmlFor="name">Job Title</Label>
+                        <Input type="text" id="name" placeholder="Job Title" />
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>Continue</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
 
             <div className="flex flex-row mt-10 justify-between">
               <div>
                 <p className="text-lg font-bold">
-                <BriefcaseIcon /> Key Roles
+                  <BriefcaseIcon /> Key Roles
                 </p>
-               
+
                 <div className="flex flex-row mt-2 items-center">
-             
                   <p className="mt-2 mx-5 text-gray-700 text-sm">
                     {user.currentJob?.responsibilities?.map((item, i) => (
                       <p key={i} className="mt-2 mx-5 text-gray-700 text-sm">
@@ -166,16 +236,19 @@ function page() {
 
             <div className="flex flex-row mt-10 justify-between">
               <div>
-                <p className="text-lg font-bold">    <BriefcaseIcon /> Previous Work Experience</p>
+                <p className="text-lg font-bold">
+                  {" "}
+                  <BriefcaseIcon /> Previous Work Experience
+                </p>
                 {user.previousWorkExperience?.map((item, i) => (
                   <div className="flex flex-row mt-2 items-center">
-                 
                     <div>
                       <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
-                        {item.employer} - {item.jobTitle} {"("} {moment(item.startDate).format('MMMM d, YYYY') }{" "}
-                        {"-"} {moment(item.endDate).format('MMMM d, YYYY')} {")"}
+                        {item.employer} - {item.jobTitle} {"("}{" "}
+                        {moment(item.startDate).format("MMMM d, YYYY")} {"-"}{" "}
+                        {moment(item.endDate).format("MMMM d, YYYY")} {")"}
                       </p>
-                      
+
                       {item.responsibilities?.map((r, idx) => (
                         <p className="mx-5 text-gray-400 text-xs">
                           {"- "}
@@ -190,8 +263,11 @@ function page() {
             </div>
 
             <div className="flex flex-row mt-2 justify-between">
-              <div> 
-                <p className="text-lg font-bold">  <BriefcaseIcon /> Skills</p>
+              <div>
+                <p className="text-lg font-bold">
+                  {" "}
+                  <BriefcaseIcon /> Skills
+                </p>
                 <p className="mt-2 text-gray-700 text-sm">
                   {user.keySkills?.map((item, idx) => (
                     <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
@@ -205,7 +281,10 @@ function page() {
 
             <div className="flex flex-row mt-2 justify-between">
               <div>
-                <p className="text-lg font-bold">  <BriefcaseIcon /> Courses</p>
+                <p className="text-lg font-bold">
+                  {" "}
+                  <BriefcaseIcon /> Courses
+                </p>
                 <p className="mt-2 text-gray-700 text-sm">
                   {user.keyCourses?.map((item, idx) => (
                     <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
@@ -217,33 +296,34 @@ function page() {
               <Edit className="cursor-pointer" />
             </div>
             <div className="flex flex-row mt-5 justify-between">
-         
-             
               <div>
                 <p className="text-lg font-bold">CV</p>
                 <p className="mt-2 text-gray-700 text-sm">
-                <input
-                  style={{ marginBottom: "2%" }}
-                  className="form-control"
-                  type="file"
-                  id="cv"
-                  name="cv"
-                  onChange={saveCV}
-                />
-                <br/>
-                {user.cvUrl!="" && <a href={user.cvUrl} target="_blank">Download CV</a>}
+                  <input
+                    style={{ marginBottom: "2%" }}
+                    className="form-control"
+                    type="file"
+                    id="cv"
+                    name="cv"
+                    onChange={saveCV}
+                  />
+                  <br />
+                  {user.cvUrl != "" && (
+                    <a href={user.cvUrl} target="_blank">
+                      Download CV
+                    </a>
+                  )}
                   {/* <button >Download CV</button> */}
                   {/* <button style={{float:"right"}}>Upload Video CV</button> */}
                 </p>
               </div>
-       
-          
-             <input
+
+              <input
                 type="submit"
                 onClick={() => {
                   addPersonnel();
                 }}
-                />
+              />
             </div>
           </>
         )}

@@ -43,59 +43,44 @@ function Skills() {
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
 
   const _loadData = async () => {
-    
     const data = await localStorage.getItem("currentPersonnel");
 
-    if (data!=undefined) {
+    if (data != undefined) {
       const personnel: IPersonnel = JSON.parse(data);
-      console.log("erson", personnel)
-      setSkills(personnel.keySkills??[]);
-      setCourses(personnel.keyCourses??[])
-    
+      console.log("erson", personnel);
+      setSkills(personnel.keySkills ?? []);
+      setCourses(personnel.keyCourses ?? []);
     }
   };
 
   const addPageDetailsToState = async () => {
-    const payload = 
-    {
+    const payload = {
       ..._personnelFromState,
-      keySkills:skills,
-      keyCourses: courses     
+      keySkills: skills,
+      keyCourses: courses,
+    } as IPersonnel;
 
-     } as IPersonnel
-
-    dispatch(
-      setPersonnel(payload)
-    );
-    await localStorage.setItem(
-      "currentPersonnel",
-      JSON.stringify(payload)
-    );
+    dispatch(setPersonnel(payload));
+    await localStorage.setItem("currentPersonnel", JSON.stringify(payload));
     router.push("/protected/createProfile/workModel");
   };
 
-  
-
   const addSkill = () => {
-    setSkills([...skills, skill]);
+    setSkills((current) => [...current, skill]);
     setSkill("");
   };
 
   const addCourse = () => {
-    setCourses([...courses, course])
+    setCourses((current) => [...current, course]);
     setCourse("");
   };
 
   const removeSkill = (idx: number) => {
-    const temp = skills;
-    temp.splice(idx, 1);
-    setSkills(temp);
+    setSkills((current) => current.filter((_, i) => i !== idx));
   };
 
   const removeCourse = (idx: number) => {
-    let temp = courses;
-    temp.splice(idx, 1);
-    setCourses(temp);
+    setCourses((current) => current.filter((_, i) => i !== idx));
   };
   return (
     <>
