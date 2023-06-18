@@ -15,20 +15,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Api } from "@/lib/api/endpoints";
-import { IPersonnel } from "@/lib/interfaces/personnel";
+import { IJobInformation, IPersonnel } from "@/lib/interfaces/personnel";
 import { IUserResponseModel } from "@/lib/interfaces/user";
 import { uploadCV } from "@/lib/personnelService";
+import CreatableSelect from 'react-select/creatable';
 import { setPersonnel } from "@/lib/personnelSlice";
 import {
+  BookOpenCheck,
   BriefcaseIcon,
   Calendar,
   CalendarIcon,
+  ClipboardCheck,
+  DownloadCloud,
   Edit,
   NetworkIcon,
   User,
+  UserCheck,
+  UserCircle,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
+import Select from "react-select";
+import { courses, getOptionFromValue, roles, skills } from "@/lib/data";
+import { useDispatch, useSelector } from "react-redux";
 
 function page() {
   useEffect(() => {
@@ -38,6 +47,13 @@ function page() {
   const [cv, setCV] = useState<Blob | undefined>();
   const [initials, setInitials] = useState("");
   const [user, setUser] = useState<IPersonnel>();
+  const [selectedOptions, setSelectedOptions] = useState();
+  const dispatch = useDispatch();
+
+  
+  const [about, setAbout] = useState("");
+  const [currentJob, setCurrentJob] = useState<IJobInformation>();
+  
 
   const saveCV = (e: any) => {
     setCV(e.target.files[0]);
@@ -88,11 +104,44 @@ function page() {
         "" + loggedInUser.surname?.substring(0, 1)!;
       setInitials(ini);
     } else {
+      
       var savedUser = await getPersonnel();
       console.log("saved.", savedUser);
       setUser(savedUser);
+      dispatch(setPersonnel(savedUser));
+      await localStorage.setItem("currentPersonnel", JSON.stringify(savedUser));
     }
   };
+
+
+  function handleSelectCourses(data:any) {
+    const payload = {...user, courses:data.map((x:any)=>x.value)}
+    dispatch(setPersonnel(payload));
+  }
+
+
+  function handleSelectSkills(data:any) {
+    const payload = {...user, keySkills:data.map((x:any)=>x.value)} as IPersonnel;
+    setUser(payload);
+  }
+  
+  function updateBio(){
+    const _user = {...user,personalInformation:{...user?.personalInformation, about:about}} as IPersonnel;
+    console.log("YSEE", user)
+    setUser(_user);
+  }
+
+  function updateCurrentJob(){
+    const _user = {...user,currentJob: currentJob} as IPersonnel;
+    setUser(_user);
+  }
+
+  // const addPageDetailsToState = async () => {
+
+  //   dispatch(setPersonnel(payload));
+  //   await localStorage.setItem("currentPersonnel", JSON.stringify(payload));
+  //   router.push("/protected/createProfile/skills");
+  // };
 
   return (
     <div className="m-10 flex flex-row space-x-5">
@@ -119,6 +168,7 @@ function page() {
               {user.personalInformation.province},
               {user.personalInformation.country}
             </p>
+        
           </>
         )}
       </div>
@@ -144,39 +194,43 @@ function page() {
                       <Textarea
                         placeholder="Tell us a little bit about your work experience"
                         className="resize-none"
+                        defaultValue={user?.personalInformation?.about}
+                        onChange={(e)=>setAbout(e.target.value)}
                       />
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
+                    <AlertDialogAction onClick={updateBio}>Continue</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
 
             <div className="flex flex-row mt-10 justify-between">
-              <div>
+              <div style={{width: "100%"}}>
                 <p className="text-lg font-bold">
-                  <BriefcaseIcon /> Current Role and Responsibilities
+                  <ClipboardCheck style={{float:"left",marginRight:"2%"}} /> Current Role and Responsibilities
                 </p>
-                <div className="flex flex-row mt-2 items-center">
-                  <p className="mt-2 mx-5 text-gray-700 text-sm">
+                <br/>
+                <div className="flex flex-row mt-2 ml-5 items-center">
+                  <p className="mt-2  mx-5 text-gray-700 text-sm">
                     Company name: {user.currentJob?.employer}
                   </p>
                 </div>
-                <div className="flex flex-row mt-2 items-center">
+                <div className="flex flex-row mt-2  ml-5 items-center">
                   <p className="mt-2 mx-5 text-gray-700 text-sm">
                     Job title: {user.currentJob?.jobTitle}
                   </p>
                 </div>
-                <div className="flex flex-row mt-2 items-center">
+                <div className="flex flex-row mt-2  ml-5 items-center">
                   <p className="mt-2 mx-5 text-gray-700 text-sm">
                     Starting Date:{" "}
                     {moment(user?.currentJob?.startDate).format("MMMM d, YYYY")}
                   </p>
                 </div>
                 <div className="flex flex-row mt-2 items-center"></div>
+                <br/>
               </div>
               <AlertDialog>
                 <AlertDialogTrigger>
@@ -192,17 +246,89 @@ function page() {
                           type="text"
                           id="name"
                           placeholder="Company Name"
+                          defaultValue={user.currentJob?.employer}
+                          onChange={(e)=>{
+                            const currentJob = {
+                              ...user.currentJob,
+                              employer: e.target.value
+                            }
+                            setCurrentJob(currentJob);
+                          }}
                         />
                       </div>
 
                       <div className="grid w-full items-center mt-5 gap-1.5">
                         <Label htmlFor="name">Start Date</Label>
-                        <Input type="text" id="name" placeholder="Start Date" />
+                        <Input type="date" 
+                          onChange={(e)=>{
+                            const currentJob = {
+                              ...user.currentJob,
+                              startDate: e.target.value
+                            }
+                            setCurrentJob(currentJob);
+                          }}
+
+                          defaultValue={user.currentJob?.startDate} 
+                          id="name" placeholder="Start Date" />
                       </div>
 
                       <div className="grid w-full items-center mt-5 gap-1.5">
                         <Label htmlFor="name">Job Title</Label>
-                        <Input type="text" id="name" placeholder="Job Title" />
+                        <Input type="text"
+                          onChange={(e)=>{
+                            const currentJob = {
+                              ...user.currentJob,
+                              jobTitle: e.target.value
+                            }
+                            setCurrentJob(currentJob);
+                          }}
+                           defaultValue={user.currentJob?.jobTitle} id="name" placeholder="Job Title" />
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={updateCurrentJob}>Continue</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+            <hr/>
+
+            <div className="flex flex-row mt-10 justify-between">
+              <div style={{width: "100%"}}>
+                  <p className="text-lg font-bold">
+                    <UserCircle style={{float:"left",marginRight:"2%"}} />  Key Roles
+                  </p>
+
+                <div className="flex flex-row mt-2  ml-5 items-center">
+                  <p className="mt-2 mx-5 text-gray-700 text-sm">
+                    {user.currentJob?.responsibilities?.map((item, i) => (
+                      <p key={i} className="mt-2 mx-5 text-gray-700 text-sm">
+                        {"- "}
+                        {item.content}
+                      </p>
+                    ))}
+                  </p>
+                </div>
+                <br/>
+              </div>
+              {/* <Edit className="cursor-pointer" /> */}
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Edit className="cursor-pointer" />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Edit Roles & Responsibilities</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <div className="grid w-full items-center mt-5 gap-1.5">
+                        <Label htmlFor="name">Roles</Label>
+                        <CreatableSelect isMulti options={roles} />
+                      </div>
+                      <div className="grid w-full items-center mt-5 gap-1.5">
+                        <Label htmlFor="name">Responsibilities</Label>
+                        <CreatableSelect isMulti options={[]} />
                       </div>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -213,35 +339,15 @@ function page() {
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-
+            <hr/>
             <div className="flex flex-row mt-10 justify-between">
-              <div>
-                <p className="text-lg font-bold">
-                  <BriefcaseIcon /> Key Roles
+              <div style={{width: "100%"}}>
+                  <p className="text-lg font-bold">
+                    <BriefcaseIcon style={{float:"left",marginRight:"2%"}} />  Previous Work Experience
                 </p>
-
-                <div className="flex flex-row mt-2 items-center">
-                  <p className="mt-2 mx-5 text-gray-700 text-sm">
-                    {user.currentJob?.responsibilities?.map((item, i) => (
-                      <p key={i} className="mt-2 mx-5 text-gray-700 text-sm">
-                        {"- "}
-                        {item.content}
-                      </p>
-                    ))}
-                  </p>
-                </div>
-              </div>
-              <Edit className="cursor-pointer" />
-            </div>
-
-            <div className="flex flex-row mt-10 justify-between">
-              <div>
-                <p className="text-lg font-bold">
-                  {" "}
-                  <BriefcaseIcon /> Previous Work Experience
-                </p>
+                <br/>
                 {user.previousWorkExperience?.map((item, i) => (
-                  <div className="flex flex-row mt-2 items-center">
+                  <div className="flex flex-row mt-2  ml-5 items-center">
                     <div>
                       <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
                         {item.employer} - {item.jobTitle} {"("}{" "}
@@ -257,51 +363,110 @@ function page() {
                       ))}
                     </div>
                   </div>
-                ))}
+                ))} 
+                <br/>
               </div>
               <Edit className="cursor-pointer" />
+             
             </div>
-
+            <hr/>
             <div className="flex flex-row mt-2 justify-between">
-              <div>
+            <div style={{width: "100%"}}>
                 <p className="text-lg font-bold">
-                  {" "}
-                  <BriefcaseIcon /> Skills
+                  <UserCheck style={{float:"left",marginRight:"2%"}} /> Skills
                 </p>
-                <p className="mt-2 text-gray-700 text-sm">
-                  {user.keySkills?.map((item, idx) => (
+                <br/>
+                <p className="mt-2 text-gray-700  ml-5 text-sm">
+                  {getOptionFromValue(user.keySkills??[], skills)?.map((item, idx) => (
                     <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
-                      {"- "} {item}
+                      {"- "} {item.label}
                     </p>
                   ))}
                 </p>
+                <br/>
               </div>
-              <Edit className="cursor-pointer" />
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Edit className="cursor-pointer" />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Edit skills</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <div className="grid w-full items-center mt-5 gap-1.5">
+                        <Label htmlFor="name">Skills</Label>
+                        <Select
+                          options={skills}
+                          placeholder="Search skills"
+                          value={getOptionFromValue(user.keySkills??[], skills)}
+                          onChange={handleSelectSkills}
+                          isSearchable={true}
+                          isMulti
+                        />
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>Continue</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
-
+            <hr/>
             <div className="flex flex-row mt-2 justify-between">
-              <div>
+              <div style={{width: "100%"}}>
                 <p className="text-lg font-bold">
-                  {" "}
-                  <BriefcaseIcon /> Courses
+                  <BookOpenCheck style={{float:"left",marginRight:"2%"}} />  Courses
+             
                 </p>
-                <p className="mt-2 text-gray-700 text-sm">
-                  {user.keyCourses?.map((item, idx) => (
+                <br/>
+                <p className="mt-2 text-gray-700 text-sm ml-5">
+                  {getOptionFromValue(user.keyCourses??[], courses)?.map((item, idx) => (
                     <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
-                      {"- "} {item}
+                      {"- "} {item.label}
                     </p>
                   ))}
                 </p>
+                <br/>
               </div>
-              <Edit className="cursor-pointer" />
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Edit className="cursor-pointer" />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Edit courses</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <div className="grid w-full items-center mt-5 gap-1.5">
+                        <Label htmlFor="name">Courses</Label>
+                        <Select
+                          options={courses}
+                          placeholder="Search courses"
+                          value={getOptionFromValue(user.keyCourses??[], courses)}
+                          onChange={handleSelectCourses}
+                          isSearchable={true}
+                          isMulti
+                        />
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>Continue</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
+            <hr/>
             <div className="flex flex-row mt-5 justify-between">
               <div>
-                <p className="text-lg font-bold">CV</p>
-                <p className="mt-2 text-gray-700 text-sm">
+                <p className="text-lg font-bold">  <DownloadCloud style={{float:"left",marginRight:"2%"}} /> CV</p>
+                <p className="mt-2 text-gray-700 text-sm ml-5">
+                  <br/>
                   <input
                     style={{ marginBottom: "2%" }}
-                    className="form-control"
+                    className="form-control inputfile ml-5"
                     type="file"
                     id="cv"
                     name="cv"
@@ -317,14 +482,18 @@ function page() {
                   {/* <button style={{float:"right"}}>Upload Video CV</button> */}
                 </p>
               </div>
-
+             
+            </div>
+            <div className="flex flex-row mt-5 justify-between">
+                <div style={{textAlign:"right", width:"100%"}}>
               <input
                 type="submit"
+               
                 onClick={() => {
                   addPersonnel();
                 }}
-              />
-            </div>
+              /></div>
+              </div>
           </>
         )}
       </div>

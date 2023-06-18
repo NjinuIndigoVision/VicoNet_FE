@@ -25,16 +25,17 @@ import {
 } from "@/lib/interfaces/personnel";
 import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
-import { isLoggedIn } from "@/lib/loginCheck";
+import  { IsActive, isLoggedIn } from "@/lib/loginCheck";
 import { ToastContainer, toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
 import Cookies from "universal-cookie";
-
+import Select from "react-select";
+import { IOption, getOptionFromValue, provinces } from "@/lib/data";
 function About() {
   const [about, setAbout] = useState("");
   const [country, setCountry] = useState("South Africa");
-  const [province, setProvince] = useState("KwaZulu-Natal");
+  const [province, setProvince] = useState("");
   const [isWorking, setIsWorking] = useState(false);
   const [companyName, setCompanyName] = useState<string>("");
   const [jobTitle, setJobTitle] = useState<string>("");
@@ -68,44 +69,10 @@ function About() {
     );
   };
 
-  const save = async () => {
-    const jobInformation: IJobInformation = {
-      employer: companyName,
-      jobTitle,
-      startDate: date?.toString(),
-      responsibilities: currentJobResponsibilities,
-    };
-
-    //API must match this 👇
-    console.log(jobInformation);
-
-    await localStorage.setItem(
-      "jobInformation",
-      JSON.stringify(jobInformation)
-    );
-    router.push("/protected/createProfile/education");
-  };
-
+ 
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
   const loggedInUser = cookies.get("viconet-user");
-  // const loadData = async () => {
-
-  //   const data = await localStorage.getItem("jobInformation");
-
-  //   if (data) {
-  //     const jobInformation: IJobInformation = JSON.parse(data);
-
-  //     setAbout(jobInformation.about!);
-
-  //     if (jobInformation.employer != "") {
-  //       setIsWorking(true);
-  //       setCompanyName(jobInformation.employer!);
-  //       setCurrentJobResponsibilities(jobInformation.responsibilities!);
-  //       setJobTitle(jobInformation.jobTitle!);
-  //     }
-  //   }
-  // };
-
+ 
   const _loadData = async () => {
     const data = await localStorage.getItem("currentPersonnel");
 
@@ -124,9 +91,6 @@ function About() {
     }
   };
 
-  if (!isLoggedIn()) {
-    router.push("/auth/login");
-  }
 
   //STORE
 
@@ -155,18 +119,20 @@ function About() {
     router.push("/protected/createProfile/education");
   };
 
+  console.log("rerere",_personnelFromState)
+
   //STORE
 
   return (
     <>
-      {isLoggedIn() && (
-        <>
+   
+        {IsActive() &&<>
           <p className="text-lg font-bold">About Yourself</p>
           <p className="text-xs text-gray-500 mb-5">
             Maximun characters is 700
           </p>
           <Textarea
-            value={about}
+            value={about??_personnelFromState.about}
             onChange={(e) => setAbout(e.target.value)}
             placeholder="Tell us a little bit about your work experience"
             className="resize-none"
@@ -185,13 +151,21 @@ function About() {
 
           <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
             <Label htmlFor="name">Province</Label>
-            <Input
+            {/* <Input
               value={province}
               onChange={(e) => setProvince(e.target.value)}
-              type="text"
+              type="select"
               id="name"
               placeholder="Province"
-            />
+            /> */}
+             <Select
+                          options={provinces as any}
+                          placeholder="Search province"
+                          value={getOptionFromValue([province],provinces)[0]}
+                          onChange={()=>{setProvince}}
+                          isSearchable={true}
+                          
+                        />
           </div>
 
           <div className="flex items-center space-x-2 my-5">
@@ -295,7 +269,7 @@ function About() {
             Save & Continue
           </Button>
         </>
-      )}
+      }
     </>
   );
 }

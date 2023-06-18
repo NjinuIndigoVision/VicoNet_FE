@@ -6,7 +6,8 @@ export interface IUserResponseModel{
       surname?	:string;
       email?	:string;	
       password?	:string;
-      type?:string
+      type?:string;
+      status?:string;
 }
 
 export interface IUserLoginModel{

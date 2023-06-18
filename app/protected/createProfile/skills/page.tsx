@@ -7,14 +7,17 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useState, useEffect } from "react";
 import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
-
+  import { IOption, courses, getOptionFromValue, roles, skills } from "@/lib/data";
+import Select from "react-select";
 function Skills() {
   const [skill, setSkill] = useState("");
   const [course, setCourse] = useState("");
-  const [courses, setCourses] = useState<string[]>([]);
-  const [skills, setSkills] = useState<string[]>([]);
+  const [_courses, setCourses] = useState<string[]>([]);
+  const [_skills, setSkills] = useState<string[]>([]);
   const dispatch = useDispatch();
   const router = useRouter();
+  
+  const [selectedOptions, setSelectedOptions] = useState();
 
   useEffect(() => {
     _loadData();
@@ -41,6 +44,19 @@ function Skills() {
   //   }
   // };
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
+  
+  function handleSelectCourses(data:any) {
+    const _data = data as IOption[];
+    setCourses(_data.map(x=>x.value));
+  }
+
+
+
+  function handleSelectSkills(data:any) {
+    console.log("dara",data)
+    const _data = data as IOption[];
+    setSkills(_data.map(x=>x.value));
+  }
 
   const _loadData = async () => {
     const data = await localStorage.getItem("currentPersonnel");
@@ -48,16 +64,16 @@ function Skills() {
     if (data != undefined) {
       const personnel: IPersonnel = JSON.parse(data);
       console.log("erson", personnel);
-      setSkills(personnel.keySkills ?? []);
-      setCourses(personnel.keyCourses ?? []);
+       setSkills(personnel.keySkills ?? []);
+       setCourses(personnel.keyCourses ?? []);
     }
   };
 
   const addPageDetailsToState = async () => {
     const payload = {
       ..._personnelFromState,
-      keySkills: skills,
-      keyCourses: courses,
+      keySkills: _skills,
+      keyCourses: _courses,
     } as IPersonnel;
 
     dispatch(setPersonnel(payload));
@@ -65,78 +81,30 @@ function Skills() {
     router.push("/protected/createProfile/workModel");
   };
 
-  const addSkill = () => {
-    setSkills((current) => [...current, skill]);
-    setSkill("");
-  };
-
-  const addCourse = () => {
-    setCourses((current) => [...current, course]);
-    setCourse("");
-  };
-
-  const removeSkill = (idx: number) => {
-    setSkills((current) => current.filter((_, i) => i !== idx));
-  };
-
-  const removeCourse = (idx: number) => {
-    setCourses((current) => current.filter((_, i) => i !== idx));
-  };
   return (
     <>
       <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
         <Label htmlFor="name">Skill</Label>
-        <Input
-          value={skill}
-          onChange={(e) => setSkill(e.target.value)}
-          type="text"
-          id="name"
-          placeholder="Skill"
-        />
+          <Select
+              options={skills}
+              placeholder="Search skills"
+              value={getOptionFromValue(_skills, skills)}
+              onChange={handleSelectSkills}
+              isSearchable={true}
+              isMulti
+            />
       </div>
-
-      {skills.map((item, idx) => (
-        <div
-          key={idx}
-          className="flex flex-row justify-between my-5 w-full max-w-sm "
-        >
-          <div>
-            <p className="font-bold">{item}</p>
-          </div>
-          <Button onClick={() => removeSkill(idx)}>Remove</Button>
-        </div>
-      ))}
-
-      <Button className="mt-5" onClick={addSkill}>
-        Add Skill
-      </Button>
-
       <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
         <Label htmlFor="name">Course</Label>
-        <Input
-          value={course}
-          onChange={(e) => setCourse(e.target.value)}
-          type="text"
-          id="name"
-          placeholder="Course"
-        />
+          <Select
+            options={courses as IOption[]}
+            placeholder="Search courses"
+            value={getOptionFromValue(_courses, courses)}
+            onChange={handleSelectCourses}
+            isSearchable={true}
+            isMulti
+          />
       </div>
-
-      {courses.map((item, idx) => (
-        <div
-          key={idx}
-          className="flex flex-row justify-between my-5 w-full max-w-sm "
-        >
-          <div>
-            <p className="font-bold">{item}</p>
-          </div>
-          <Button onClick={() => removeCourse(idx)}>Remove</Button>
-        </div>
-      ))}
-
-      <Button className="mt-5" onClick={addCourse}>
-        Add Course
-      </Button>
 
       <div className="flex flex-row space-x-4">
         <Button className="mt-5" onClick={() => router.back()}>
