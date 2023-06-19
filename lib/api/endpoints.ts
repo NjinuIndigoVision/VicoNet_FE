@@ -87,7 +87,7 @@ export const Api = {
   ): Promise<IResponseObject<IUserResponseModel>> => {
     const response = await POST(`${url}/users`, payload);
     const _response = {
-      error: response.statusText != "OK",
+      error: response.status != 200,
       message: response.statusText,
       data: response.data,
       status:response.status
