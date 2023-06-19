@@ -5,8 +5,8 @@ import { GET, POST } from "./client";
 import { IResponseObject } from "./response";
 
 
-const url = "http://localhost:8080/api";
-// const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
+// const url = "http://localhost:8080/api";
+const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
 
 
 export const Api = {
