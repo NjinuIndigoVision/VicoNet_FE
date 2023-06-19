@@ -1,5 +1,5 @@
 import Cookies from "universal-cookie";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { IUserResponseModel } from "./interfaces/user";
 
 export function isLoggedIn():boolean{
@@ -11,7 +11,10 @@ return isLoggedIn?._id!=undefined;
 }
 
 export function IsActive():boolean{
-return false;
+    const cookies = new Cookies();
+
+const isLoggedIn = cookies.get('viconet-user')as IUserResponseModel ;
+return isLoggedIn?.status!="0";
 
 }
 
