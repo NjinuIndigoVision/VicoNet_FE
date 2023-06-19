@@ -389,72 +389,7 @@ function page() {
               </AlertDialog>
             </div>
             <hr />
-            <div className="flex flex-row mt-10 justify-between">
-              <div>
-                <p className="text-lg font-bold">
-                  <BriefcaseIcon /> Key Roles
-                </p>
-
-                <div className="flex flex-row mt-2 items-center">
-                  <p className="mt-2 mx-5 text-gray-700 text-sm">
-                    {user.currentJob?.responsibilities?.map((item, i) => (
-                      <p key={i} className="mt-2 mx-5 text-gray-700 text-sm">
-                        {"- "}
-                        {item.content}
-                      </p>
-                    ))}
-                  </p>
-                </div>
-              </div>
-              <AlertDialog>
-                <AlertDialogTrigger>
-                  <Edit className="cursor-pointer" />
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Roles and Responsibilities
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      <div className="flex flex-row justify-center space-x-2">
-                        <div className="flex-1">
-                          <Input
-                            value={responsibility}
-                            onChange={(e) => setResponsibility(e.target.value)}
-                            type="text"
-                            id="name"
-                            placeholder="Role and Responsibility"
-                          />
-                        </div>
-                        <div className="">
-                          <Button onClick={addResponsibility}>Add</Button>
-                        </div>
-                      </div>
-                      {user.currentJob?.responsibilities?.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex flex-row justify-between my-5 w-full"
-                        >
-                          <p>{item.content}</p>
-                          <Button onClick={() => removeResponsibility(idx)}>
-                            Remove
-                          </Button>
-                        </div>
-                      ))}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => console.log("MUST SEND USER TO API", user)}
-                    >
-                      Save
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-
+  
             <div className="flex flex-row mt-10 justify-between">
               <div>
                 <p className="text-lg font-bold">

@@ -71,7 +71,6 @@ export const Api = {
     payload: string
   ): Promise<IPersonnel> => {
     const response = await GET(`${url}/personnel/${payload}`);
-    console.log("HIII",response)
     const _response = {
       error:response.status != 200,
       message: response.statusText,
