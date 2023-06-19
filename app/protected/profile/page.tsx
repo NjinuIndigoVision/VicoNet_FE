@@ -58,7 +58,6 @@ function page() {
 
   const saveCV = (e: any) => {
     setCV(e.target.files[0]);
-    console.log(cv);
   };
 
   const cookies = new Cookies();
@@ -145,10 +144,6 @@ function page() {
     
   }
 
-  const logout= async()=>{
-    cookies.remove("viconet-user")
-    router.replace("/auth/login");
-  }
 
 
   return (
