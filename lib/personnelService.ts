@@ -1,6 +1,6 @@
 import axios from "axios";
 import { IPersonnel, IPersonnelRequestModel } from "./interfaces/personnel";
-import { Api } from "./api/endpoints";
+import { Api, url } from "./api/endpoints";
 
 export async function uploadCV(formData: FormData){
 
@@ -8,7 +8,7 @@ export async function uploadCV(formData: FormData){
         headers: { 'content-type': 'multipart/form-data',  "Access-Control-Allow-Origin": "*"},
         
     }
-   const resp = await axios.post("http://localhost:8080/api/upload_cv/1", formData, config)
+   const resp = await axios.post(`${url}/upload_cv/1`, formData, config)
    return resp;
 
 
