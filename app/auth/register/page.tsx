@@ -55,7 +55,7 @@ export default function Register() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
 
-    console.log("Ref", values);
+    console.log("Registering");
     const _id = toast.loading("Registering user..", {
       position: "top-center",
       autoClose: 100,
@@ -80,6 +80,7 @@ export default function Register() {
    
     
     const response = await Api.POST_Register(payload);
+    console.log("Ref", response);
     if (response?.error) {
       toast.update(_id, {
         render: "An error occured when registering user, please try again",

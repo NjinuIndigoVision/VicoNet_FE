@@ -2,6 +2,7 @@
 import { Separator } from "@radix-ui/react-select";
 import { Metadata } from "next";
 import { SidebarNav } from "./components/sidebar-nav";
+import {isLoggedIn } from "@/lib/loginCheck";
 
 const sidebarNavItems = [
   {
@@ -33,7 +34,8 @@ interface SettingsLayoutProps {
 export default function CreateProfileLayout({ children }: SettingsLayoutProps) {
   return (
     <>
-      <div className="hidden space-y-6 p-10 pb-16 md:block">
+    {/* {ActiveGuard()} */}
+      {isLoggedIn() && <div className="hidden space-y-6 p-10 pb-16 md:block">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">
             Let's build your profile
@@ -50,6 +52,7 @@ export default function CreateProfileLayout({ children }: SettingsLayoutProps) {
           <div className="flex-1 lg:max-w-2xl">{children}</div>
         </div>
       </div>
+  }
     </>
   );
 }

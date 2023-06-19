@@ -27,7 +27,7 @@ export interface IEducationInformation{
 }
 export interface IPersonnel {
   searchKeys?:string;
-  // information?:string; // personal info->about
+  about?:string; // personal info->about
   currentJob?: IJobInformation;
   previousWorkExperience?:IJobInformation[];
   yearsOfExperience?:string,

@@ -1,12 +1,12 @@
 import { IPersonnel } from "../interfaces/personnel";
-import { IActivateAccount, IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
+import { IActivateAccount, IDeleteUserModel, IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
 
 
-const url = "http://localhost:8080/api";
-// const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
+// const url = "http://localhost:8080/api";
+const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
 
 
 export const Api = {
@@ -31,7 +31,7 @@ export const Api = {
   ): Promise<IResponseObject<IUserResponseModel>> => {
     const response = await POST(`${url}/login`, payload);
     const _response = {
-      error: response.statusText != "OK",
+      error: response.status != 200,
       message: response.statusText,
       data: response.data,
       status: response.status,
@@ -44,7 +44,7 @@ export const Api = {
   ): Promise<IResponseObject<IUserResponseModel>> => {
     const response = await POST(`${url}/users/verify`, payload);
     const _response = {
-      error: response.statusText != "OK",
+      error: response.status != 200,
       message: response.statusText,
       data: response.data,
       status: response.status,
@@ -58,7 +58,7 @@ export const Api = {
   ): Promise<IResponseObject<IPersonnel>> => {
     const response = await POST(`${url}/personnel`, payload);
     const _response = {
-      error: response.statusText != "OK",
+      error: response.status != 200,
       message: response.statusText,
       data: response.data,
       status: response.status,
@@ -73,7 +73,7 @@ export const Api = {
     const response = await GET(`${url}/personnel/${payload}`);
     console.log("HIII",response)
     const _response = {
-      error: response.statusText != "OK",
+      error:response.status != 200,
       message: response.statusText,
       data: response,
       status: response.status,
@@ -82,12 +82,13 @@ export const Api = {
     return response;
   },
 
+
   POST_Register: async (
     payload: IUserRegisterModel
   ): Promise<IResponseObject<IUserResponseModel>> => {
     const response = await POST(`${url}/users`, payload);
     const _response = {
-      error: response.statusText != "OK",
+      error: response.status != 200,
       message: response.statusText,
       data: response.data,
       status:response.status
@@ -95,12 +96,28 @@ export const Api = {
     
     return _response;
   },
+
+  POST_DeleteUser: async (
+    payload: IDeleteUserModel
+  ): Promise<IResponseObject<IUserResponseModel>> => {
+    const response = await POST(`${url}/users/delete`, payload);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response.data,
+      status:response.status
+    } as IResponseObject<IUserResponseModel>
+    
+    return _response;
+  },
+
+
   POST_Personnel: async (
     payload: IPersonnel
   ): Promise<IResponseObject<IPersonnel>> => {
     const response = await POST(`${url}/personnel`, payload);
     const _response =  {
-      error: response.statusText!="OK",
+      error: response.status != 200,
       message:response.statusText,
       data: response.data,
       status:response.status
