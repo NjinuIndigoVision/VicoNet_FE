@@ -47,7 +47,7 @@ export default function Register() {
   const [value, setValue] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
-  const email = window.location.search.replace("?email=","");
+  let email = typeof window!="undefined"? window?.location?.search.replace("?email=",""):"";
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
 
