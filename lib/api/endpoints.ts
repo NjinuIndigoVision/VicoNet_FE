@@ -1,5 +1,5 @@
 import { IPersonnel } from "../interfaces/personnel";
-import { IActivateAccount, IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
+import { IActivateAccount, IDeleteUserModel, IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
@@ -82,6 +82,7 @@ export const Api = {
     return response;
   },
 
+
   POST_Register: async (
     payload: IUserRegisterModel
   ): Promise<IResponseObject<IUserResponseModel>> => {
@@ -95,6 +96,22 @@ export const Api = {
     
     return _response;
   },
+
+  POST_DeleteUser: async (
+    payload: IDeleteUserModel
+  ): Promise<IResponseObject<IUserResponseModel>> => {
+    const response = await POST(`${url}/users/delete`, payload);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response.data,
+      status:response.status
+    } as IResponseObject<IUserResponseModel>
+    
+    return _response;
+  },
+
+
   POST_Personnel: async (
     payload: IPersonnel
   ): Promise<IResponseObject<IPersonnel>> => {

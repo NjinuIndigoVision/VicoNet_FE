@@ -16,8 +16,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Api } from "@/lib/api/endpoints";
 import { IJobInformation, IPersonnel } from "@/lib/interfaces/personnel";
-import { IUserResponseModel } from "@/lib/interfaces/user";
+import { IDeleteUserModel, IUserResponseModel } from "@/lib/interfaces/user";
 import { uploadCV } from "@/lib/personnelService";
+import { useRouter } from "next/navigation";
 import CreatableSelect from 'react-select/creatable';
 import { setPersonnel } from "@/lib/personnelSlice";
 import {
@@ -50,7 +51,7 @@ function page() {
   const [selectedOptions, setSelectedOptions] = useState();
   const dispatch = useDispatch();
 
-  
+  const router = useRouter();
   const [about, setAbout] = useState("");
   const [currentJob, setCurrentJob] = useState<IJobInformation>();
   
@@ -91,6 +92,7 @@ function page() {
     console.log("DSSDS", response);
     return response as IPersonnel;
   };
+
 
   const getUser = async () => {
     //We'll replace this with an API call, also need to make this a SSR component
@@ -136,12 +138,18 @@ function page() {
     setUser(_user);
   }
 
-  // const addPageDetailsToState = async () => {
+  const deleteUser = async()=>{
 
-  //   dispatch(setPersonnel(payload));
-  //   await localStorage.setItem("currentPersonnel", JSON.stringify(payload));
-  //   router.push("/protected/createProfile/skills");
-  // };
+    const response = Api.POST_DeleteUser({email:loggedInUser.email} as IDeleteUserModel);
+    router.replace("/auth/login");
+    
+  }
+
+  const logout= async()=>{
+    cookies.remove("viconet-user")
+    router.replace("/auth/login");
+  }
+
 
   return (
     <div className="m-10 flex flex-row space-x-5">

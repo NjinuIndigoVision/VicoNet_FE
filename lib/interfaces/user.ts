@@ -1,3 +1,4 @@
+import { SrvRecord } from "dns";
 
 export interface IUserResponseModel{
       _id? :string;
@@ -8,6 +9,10 @@ export interface IUserResponseModel{
       password?	:string;
       type?:string;
       status?:string;
+}
+
+export interface IDeleteUserModel{
+  email:string
 }
 
 export interface IUserLoginModel{
