@@ -11,14 +11,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Api } from "@/lib/api/endpoints";
-import { IPersonnel } from "@/lib/interfaces/personnel";
+import { IJobResponsibilities, IPersonnel } from "@/lib/interfaces/personnel";
 import { IUserResponseModel } from "@/lib/interfaces/user";
 import { uploadCV } from "@/lib/personnelService";
 import { setPersonnel } from "@/lib/personnelSlice";
+import { current } from "@reduxjs/toolkit";
 import {
   BriefcaseIcon,
   Calendar,
@@ -38,10 +40,30 @@ function page() {
   const [cv, setCV] = useState<Blob | undefined>();
   const [initials, setInitials] = useState("");
   const [user, setUser] = useState<IPersonnel>();
+  const [currentJobResponsibilities, setCurrentJobResponsibilities] = useState<
+    IJobResponsibilities[]
+  >([]);
+  const [responsibility, setResponsibility] = useState("");
 
   const saveCV = (e: any) => {
     setCV(e.target.files[0]);
     console.log(cv);
+  };
+
+  const addResponsibility = () => {
+    if (responsibility != "") {
+      setCurrentJobResponsibilities((current) => [
+        ...current,
+        { content: responsibility },
+      ]);
+      setResponsibility("");
+    }
+  };
+
+  const removeResponsibility = (idx: number) => {
+    setCurrentJobResponsibilities((current) =>
+      current.filter((_, i) => i !== idx)
+    );
   };
 
   const cookies = new Cookies();
@@ -142,6 +164,14 @@ function page() {
                     <AlertDialogTitle>Edit Bio</AlertDialogTitle>
                     <AlertDialogDescription>
                       <Textarea
+                        value={user.personalInformation.about}
+                        onChange={(e) => {
+                          setUser((prev) => {
+                            const usr = { ...prev };
+                            usr.personalInformation!.about = e.target.value;
+                            return usr;
+                          });
+                        }}
                         placeholder="Tell us a little bit about your work experience"
                         className="resize-none"
                       />
@@ -149,7 +179,11 @@ function page() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
+                    <AlertDialogAction
+                      onClick={() => console.log("MUST SEND USER TO API", user)}
+                    >
+                      Save
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -192,23 +226,55 @@ function page() {
                           type="text"
                           id="name"
                           placeholder="Company Name"
+                          value={user.currentJob?.employer}
+                          onChange={(e) => {
+                            setUser((prev) => {
+                              const usr = { ...prev };
+                              usr.currentJob!.employer = e.target.value;
+                              return usr;
+                            });
+                          }}
                         />
                       </div>
 
                       <div className="grid w-full items-center mt-5 gap-1.5">
                         <Label htmlFor="name">Start Date</Label>
-                        <Input type="text" id="name" placeholder="Start Date" />
+                        <Input
+                          type="text"
+                          id="name"
+                          placeholder="Start Date"
+                          value={user.currentJob?.startDate}
+                          onChange={(e) => {
+                            setUser((prev) => {
+                              const usr = { ...prev };
+                              usr.currentJob!.startDate = e.target.value;
+                              return usr;
+                            });
+                          }}
+                        />
                       </div>
 
                       <div className="grid w-full items-center mt-5 gap-1.5">
                         <Label htmlFor="name">Job Title</Label>
-                        <Input type="text" id="name" placeholder="Job Title" />
+                        <Input
+                          type="text"
+                          id="name"
+                          placeholder="Job Title"
+                          value={user.currentJob?.jobTitle}
+                          onChange={(e) => {
+                            setUser((prev) => {
+                              const usr = { ...prev };
+                              usr.currentJob!.jobTitle = e.target.value;
+                              return usr;
+                            });
+                          }}
+                        />
                       </div>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
+                    <AlertDialogAction>Save</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -231,7 +297,53 @@ function page() {
                   </p>
                 </div>
               </div>
-              <Edit className="cursor-pointer" />
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Edit className="cursor-pointer" />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Roles and Responsibilities
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <div className="flex flex-row justify-center space-x-2">
+                        <div className="flex-1">
+                          <Input
+                            value={responsibility}
+                            onChange={(e) => setResponsibility(e.target.value)}
+                            type="text"
+                            id="name"
+                            placeholder="Role and Responsibility"
+                          />
+                        </div>
+                        <div className="">
+                          <Button onClick={addResponsibility}>Add</Button>
+                        </div>
+                      </div>
+                      {user.currentJob?.responsibilities?.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex flex-row justify-between my-5 w-full"
+                        >
+                          <p>{item.content}</p>
+                          <Button onClick={() => removeResponsibility(idx)}>
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => console.log("MUST SEND USER TO API", user)}
+                    >
+                      Save
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
 
             <div className="flex flex-row mt-10 justify-between">
@@ -259,7 +371,54 @@ function page() {
                   </div>
                 ))}
               </div>
-              <Edit className="cursor-pointer" />
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Edit className="cursor-pointer" />
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Roles and Responsibilities
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <div className="flex flex-row justify-center space-x-2">
+                        <div className="flex-1">
+                          <Input
+                            value={responsibility}
+                            onChange={(e) => setResponsibility(e.target.value)}
+                            type="text"
+                            id="name"
+                            placeholder="Role and Responsibility"
+                          />
+                        </div>
+                        <div className="">
+                          <Button onClick={addResponsibility}>Add</Button>
+                        </div>
+
+                        {currentJobResponsibilities.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="flex flex-row justify-between my-5 w-full max-w-sm "
+                          >
+                            <p>{item.content}</p>
+                            <Button onClick={() => removeResponsibility(idx)}>
+                              Remove
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => console.log("MUST SEND USER TO API", user)}
+                    >
+                      Save
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
 
             <div className="flex flex-row mt-2 justify-between">
