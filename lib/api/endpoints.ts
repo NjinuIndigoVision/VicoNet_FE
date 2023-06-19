@@ -31,7 +31,7 @@ export const Api = {
   ): Promise<IResponseObject<IUserResponseModel>> => {
     const response = await POST(`${url}/login`, payload);
     const _response = {
-      error: response.statusText != "OK",
+      error: response.status != 200,
       message: response.statusText,
       data: response.data,
       status: response.status,
@@ -44,7 +44,7 @@ export const Api = {
   ): Promise<IResponseObject<IUserResponseModel>> => {
     const response = await POST(`${url}/users/verify`, payload);
     const _response = {
-      error: response.statusText != "OK",
+      error: response.status != 200,
       message: response.statusText,
       data: response.data,
       status: response.status,
@@ -58,7 +58,7 @@ export const Api = {
   ): Promise<IResponseObject<IPersonnel>> => {
     const response = await POST(`${url}/personnel`, payload);
     const _response = {
-      error: response.statusText != "OK",
+      error: response.status != 200,
       message: response.statusText,
       data: response.data,
       status: response.status,
@@ -73,7 +73,7 @@ export const Api = {
     const response = await GET(`${url}/personnel/${payload}`);
     console.log("HIII",response)
     const _response = {
-      error: response.statusText != "OK",
+      error:response.status != 200,
       message: response.statusText,
       data: response,
       status: response.status,
@@ -100,7 +100,7 @@ export const Api = {
   ): Promise<IResponseObject<IPersonnel>> => {
     const response = await POST(`${url}/personnel`, payload);
     const _response =  {
-      error: response.statusText!="OK",
+      error: response.status != 200,
       message:response.statusText,
       data: response.data,
       status:response.status
