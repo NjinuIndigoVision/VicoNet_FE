@@ -55,7 +55,7 @@ export default function Register() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
 
-
+    console.log("Registering");
     const _id = toast.loading("Registering user..", {
       position: "top-center",
       autoClose: 100,
