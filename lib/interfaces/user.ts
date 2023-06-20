@@ -33,3 +33,22 @@ export interface IUserRegisterModel{
   password:string;
   type:number;
 }
+
+export interface ICompanyRegisterModel{
+  email: string;
+  password: string;
+  userName:string;
+  userSurname: string;
+  // mobileNumber: z.string(),  
+  userNumber: string;
+  companyNumber: string;
+  companyReg: string;
+  companyName:string;
+  companyAdrress: string;
+  position:string;
+  userEmail:string;  
+}
+
+export interface ICompanyRegisterResponseModel extends ICompanyRegisterModel{
+
+}

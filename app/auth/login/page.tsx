@@ -44,8 +44,7 @@ const formSchema = z.object({
 export default function Login() {
 
   const router = useRouter();
-  
-  
+
 async function Redirect(){
   toast(`Welcome back ${isLoggedIn.firstName}`, {
     position: "top-center",
