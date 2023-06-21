@@ -1,5 +1,6 @@
+import { ICompanyRegisterModel, ICompanyRegisterResponseModel } from "../interfaces/company";
 import { IPersonnel } from "../interfaces/personnel";
-import { IActivateAccount, ICompanyRegisterModel, ICompanyRegisterResponseModel, IDeleteUserModel, IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
+import { IActivateAccount, IDeleteUserModel, IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
