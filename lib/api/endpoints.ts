@@ -1,8 +1,10 @@
+import {
+  ICompanyRegisterModel,
+  ICompanyRegisterResponseModel,
+} from "../interfaces/company";
 import { IPersonnel } from "../interfaces/personnel";
 import {
   IActivateAccount,
-  ICompanyRegisterModel,
-  ICompanyRegisterResponseModel,
   IDeleteUserModel,
   IUserLoginModel,
   IUserRegisterModel,
