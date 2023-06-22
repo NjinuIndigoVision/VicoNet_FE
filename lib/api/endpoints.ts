@@ -1,13 +1,19 @@
 import { IPersonnel } from "../interfaces/personnel";
-import { IActivateAccount, ICompanyRegisterModel, ICompanyRegisterResponseModel, IDeleteUserModel, IUserLoginModel, IUserRegisterModel, IUserResponseModel } from "../interfaces/user";
+import {
+  IActivateAccount,
+  ICompanyRegisterModel,
+  ICompanyRegisterResponseModel,
+  IDeleteUserModel,
+  IUserLoginModel,
+  IUserRegisterModel,
+  IUserResponseModel,
+} from "../interfaces/user";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
 
-
 // const url = "http://localhost:8080/api";
 export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
-
 
 export const Api = {
   Base: url,
@@ -67,20 +73,17 @@ export const Api = {
     return _response;
   },
 
-  GET_Personnel: async (
-    payload: string
-  ): Promise<IPersonnel> => {
+  GET_Personnel: async (payload: string): Promise<IPersonnel> => {
     const response = await GET(`${url}/personnel/${payload}`);
     const _response = {
-      error:response.status != 200,
+      error: response.status != 200,
       message: response.statusText,
       data: response,
       status: response.status,
     } as IResponseObject<IPersonnel>;
-    
+
     return response;
   },
-
 
   POST_Register: async (
     payload: IUserRegisterModel
@@ -90,9 +93,9 @@ export const Api = {
       error: response.status != 200,
       message: response.statusText,
       data: response.data,
-      status:response.status
-    } as IResponseObject<IUserResponseModel>
-    
+      status: response.status,
+    } as IResponseObject<IUserResponseModel>;
+
     return _response;
   },
 
@@ -104,9 +107,9 @@ export const Api = {
       error: response.status != 200,
       message: response.statusText,
       data: response.data,
-      status:response.status
-    } as IResponseObject<ICompanyRegisterResponseModel>
-    
+      status: response.status,
+    } as IResponseObject<ICompanyRegisterResponseModel>;
+
     return _response;
   },
 
@@ -118,24 +121,35 @@ export const Api = {
       error: response.status != 200,
       message: response.statusText,
       data: response.data,
-      status:response.status
-    } as IResponseObject<IUserResponseModel>
-    
+      status: response.status,
+    } as IResponseObject<IUserResponseModel>;
+
     return _response;
   },
-
 
   POST_Personnel: async (
     payload: IPersonnel
   ): Promise<IResponseObject<IPersonnel>> => {
     const response = await POST(`${url}/personnel`, payload);
-    const _response =  {
+    const _response = {
       error: response.status != 200,
-      message:response.statusText,
+      message: response.statusText,
       data: response.data,
-      status:response.status
-    } as IResponseObject<IPersonnel>
-    
+      status: response.status,
+    } as IResponseObject<IPersonnel>;
+
     return _response;
-  }
+  },
+
+  POST_Search: async (payload: any) => {
+    const response = await POST(`${url}/personnel/searchPersonnel`, payload);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response.data,
+      status: response.status,
+    } as IResponseObject<IPersonnel>;
+
+    return _response;
+  },
 };
