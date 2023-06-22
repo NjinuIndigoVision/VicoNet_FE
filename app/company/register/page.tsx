@@ -342,7 +342,7 @@ export default function Register() {
               <FormLabel>Confirm password.</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="+Confirm password"
+                  placeholder="Confirm password"
                   type={"password"}
                   {...field}
                 />

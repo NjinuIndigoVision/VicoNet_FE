@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Api } from "@/lib/api/endpoints";
 import React, { useState } from "react";
 import TalentComponent from "./components/TalentComponent";
+import { IPersonnel } from "@/lib/interfaces/personnel";
+// import Masonry, {ResponsiveMasonry} from "react-responsive-masonry"
 
 function Search() {
   const fakeData = [
@@ -57,29 +59,23 @@ function Search() {
     },
   ];
 
-  const [results, setResults] = useState(false);
+  const [results, setResults] = useState<IPersonnel[]>();
+
   const search = async () => {
-    setResults(true);
+
     try {
-      const res = await Api.POST_Search({ searchKeys: "Java" });
-      console.log(res.data);
+      const res = await Api.POST_Search({ searchKeys: "" });
+      setResults(res.data as IPersonnel[]??[])
     } catch (e: any) {
       console.log(e.message);
     }
   };
   
   return (
-    <div className="w-full h-full bg-[#27276C]">
-      <div className="px-10 py-32">
-        <div className="flex flex-row space-x-1">
-          <p className="text-3xl font-extrabold text-white">
-            Search For Suitable{" "}
-          </p>
-          <p className="text-3xl font-bold text-[#E2186D]"> Talent</p>
-        </div>
-
-        <div className="flex flex-row space-x-2 mt-5 max-w-lg">
-          <Input
+    <div className="w-full h-full ">
+      <div className="">
+        <div className="flex flex-row space-x-1 mt-2">
+        <Input
             className="bg-white"
             placeholder="Job Title, Skills, Qualifications..."
           />
@@ -87,14 +83,27 @@ function Search() {
             Search
           </Button>
         </div>
+
+        <div className="flex flex-row space-x-2 mt-5 max-w-lg">
+        
+        </div>
         {results && (
           <div className="mt-20">
-            <div className="grid grid-cols-2">
-              <TalentComponent props={fakeData[0]} />
-              <TalentComponent props={fakeData[1]} />
+            <div className="grid grid-cols-2"> 
+            {/* <ResponsiveMasonry>
+            <Masonry columnsCount={3}> */}
+                {results.map(x=> {
+                  return <>
+                 {/* <XBlock> */}
+                  <TalentComponent props={x} />
+                  {/* </XBlock> */}
+                  </>
+                })}
+              {/* </Masonry>
+              </ResponsiveMasonry> */}
             </div>
           </div>
-        )}
+        )}  
       </div>
     </div>
   );
