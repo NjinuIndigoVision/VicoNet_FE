@@ -56,6 +56,26 @@ const AlertDialogContent = React.forwardRef<
 ))
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
 
+const AlertDialogContentFull = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPortal>
+    <AlertDialogOverlay />
+    <AlertDialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed z-50 grid w-full scale-100 gap-4 border bg-background p-6 opacity-100 shadow-lg animate-in fade-in-90 slide-in-from-bottom-10 sm:rounded-lg sm:zoom-in-90 sm:slide-in-from-bottom-0 md:w-full",
+        className
+      )}
+      style={{width:"85%"}}
+      {...props}
+    />
+  </AlertDialogPortal>
+))
+AlertDialogContentFull.displayName = AlertDialogPrimitive.Content.displayName
+
+
 const AlertDialogHeader = ({
   className,
   ...props
@@ -69,6 +89,20 @@ const AlertDialogHeader = ({
   />
 )
 AlertDialogHeader.displayName = "AlertDialogHeader"
+
+const AlertDialogHeaderFull = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col space-y-2 sm:text-left",
+      className
+    )}
+    {...props}
+  />
+)
+AlertDialogHeaderFull.displayName = "AlertDialogHeader"
 
 const AlertDialogFooter = ({
   className,
@@ -95,6 +129,20 @@ const AlertDialogTitle = React.forwardRef<
   />
 ))
 AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName
+
+
+const AlertDialogTitleFull = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Title
+    ref={ref}
+    className={cn("text-lg font-semibold", className)}
+    {...props}
+  />
+))
+AlertDialogTitleFull.displayName = AlertDialogPrimitive.Title.displayName
+
 
 const AlertDialogDescription = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Description>,
@@ -145,6 +193,8 @@ export {
   AlertDialogFooter,
   AlertDialogTitle,
   AlertDialogDescription,
+  AlertDialogContentFull,
   AlertDialogAction,
   AlertDialogCancel,
+  AlertDialogHeaderFull
 }

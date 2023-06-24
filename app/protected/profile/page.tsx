@@ -365,11 +365,12 @@ function page() {
                 <AlertDialogTrigger>
                   <Edit className="cursor-pointer" />
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="search-modal">
                   <AlertDialogHeader>
                     <AlertDialogTitle>
                       Edit Roles & Responsibilities
                     </AlertDialogTitle>
+                    <hr/>
                     <AlertDialogDescription>
                       <div className="grid w-full items-center mt-5 gap-1.5">
                         <Label htmlFor="name">Roles</Label>
