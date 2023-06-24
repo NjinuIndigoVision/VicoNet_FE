@@ -12,6 +12,12 @@ export interface IJobResponsibilities{
   content:string
 }
 
+export interface IUpdateProjectPersonnel{
+  projectId:string;
+  personnelId:string;  
+  status:string;
+}
+
 export interface IJobInformation{
   employer?:string,
   jobTitle?:string,

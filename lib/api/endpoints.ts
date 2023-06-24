@@ -2,7 +2,7 @@ import {
   ICompanyRegisterModel,
   ICompanyRegisterResponseModel,
 } from "../interfaces/company";
-import { IPersonnel } from "../interfaces/personnel";
+import { IPersonnel, IUpdateProjectPersonnel } from "../interfaces/personnel";
 import {
   IActivateAccount,
   IDeleteUserModel,
@@ -10,9 +10,11 @@ import {
   IUserRegisterModel,
   IUserResponseModel,
 } from "../interfaces/user";
+import { IShortlistPersonnelRequest } from "./personnelActions";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
+import { IProjectView } from "../interfaces/project";
 
 const url = "http://localhost:8081/api";
 // export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
@@ -113,6 +115,57 @@ export const Api = {
 
     return _response;
   },
+
+  POST_ShortlistPersonnel: async (
+    payload: IShortlistPersonnelRequest
+  ): Promise<IResponseObject<IPersonnel[]>> => {
+    const response = await POST(`${url}/staff/shortlist`, payload);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response.data,
+      status: response.status,
+    } as IResponseObject<IPersonnel[]>;
+
+    return _response;
+  },
+
+  GET_ProjectById: async (projectId: string): Promise<IResponseObject<IProjectView>> => {
+    const response = await GET(`${url}/project/${projectId}`);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response,
+      status: response.status,
+    } as IResponseObject<IProjectView>;
+
+    return _response;
+  },
+
+  GET_ShortlistPersonnel: async (staffId: string): Promise<IResponseObject<IPersonnel[]>> => {
+    const response = await GET(`${url}/staff/shortlist/${staffId}`);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response,
+      status: response.status,
+    } as IResponseObject<IPersonnel[]>;
+
+    return _response;
+  },
+
+ UpdateProjectPersonnel: async (upadateRequest: IUpdateProjectPersonnel): Promise<IResponseObject<IProjectView>> => {
+    const response = await POST(`${url}/project/personnel`, upadateRequest);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response.data,
+      status: response.status,
+    } as IResponseObject<IProjectView>;
+
+    return _response;
+  },
+
 
   POST_Personnel: async (
     payload: IPersonnel

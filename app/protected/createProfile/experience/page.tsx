@@ -29,7 +29,7 @@ function Experience() {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  classNamemect(() => {
     _loadData();
   }, []);
 

@@ -20,7 +20,20 @@ export interface IStaffViewModel {
   _shortlistedDetails: IPersonnel[]
 }
 
+export const _staffMock = {
+  _id: "6492faa650751a30c3cafc4a",
+  position: "Manager",
+  _user: "6492faa650751a30c3cafc48",
+  profilePicture:"",
+  _organisation:"",
+  _userDetails:"",
+  _shortlisted:"",
+  _shortlistedDetails:[
+    
+  ]
 
+
+} as IStaffViewModel
 
 export interface ICreateStaffModel extends IUserRegisterModel{
   position:string;
