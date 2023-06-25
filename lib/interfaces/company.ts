@@ -14,6 +14,7 @@ export interface ICompanyRegisterModel{
   companyAdrress: string;
   position:string;
   userEmail:string;  
+  title?:string
 }
 
 export interface ICompanyRegisterResponseModel extends ICompanyRegisterModel{

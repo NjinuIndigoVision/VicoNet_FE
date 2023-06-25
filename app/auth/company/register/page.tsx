@@ -35,14 +35,9 @@ import { useState } from "react";
 
 
 const formSchema = z.object({
-  email: z.string().email({
-    message: INVALID_EMAIL_MESSAGE,
-  }),
-  password: z.string(),
-  userName: z.string(),
+   password: z.string(),
+   userName: z.string(),
   userSurname: z.string(),
-  confirmpassword: z.string(),
-  // mobileNumber: z.string(),  
   userNumber: z.string(),
   companyNumber: z.string(),
   companyReg: z.string(),
@@ -50,8 +45,8 @@ const formSchema = z.object({
   companyAdrress: z.string(),
   position:z.string(),
   userEmail:z.string(),
-  
-  confirmEmail:z.string(),
+   confirmPassword:z.string(),
+  confirmEmail:z.string()
 });
 
 export default function Register() {
@@ -77,15 +72,15 @@ export default function Register() {
       });
 
     const payload = {
-      email: values.email,
-      password: values.password,
-      userName:values.userName,
-      userSurname: values.userSurname,
+      title:"Mr.",
+       password: values.password,
+       userName:values.userName,
+       userSurname: values.userSurname,
       userNumber: values.userNumber,
       companyNumber: values.companyNumber,
-      companyReg: values.companyReg,
+       companyReg: values.companyReg,
       companyName:values.companyName,
-      companyAdrress: values.companyAdrress,
+       companyAdrress: values.companyAdrress,
       position:values.position,
       userEmail:values.userEmail
     } as ICompanyRegisterModel;
@@ -108,15 +103,26 @@ export default function Register() {
         isLoading: false,
         autoClose: 2000,
       });
-      router.push(`/auth/otp?email=${response.data?.email}`);
+      router.push(`/auth/otp?email=${payload.userEmail}`);
     }
   }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      // email: "",
+       password: "",
+       confirmPassword: "",
+       userName:"",
+       userSurname: "",
+      userNumber: "",
+      companyNumber: "",
+       companyReg: "",
+      companyName:"",
+       companyAdrress: "",
+      position:"",
+      userEmail:"",
+      confirmEmail:""
     },
   });
 
@@ -131,17 +137,6 @@ export default function Register() {
       </div>
       <div className="m-14">
         <p className="text-center font-bold text-2xl">Create an account</p>
-        {/* <>
-      <h2>
-        PersonnelFromStore 
-       Id: {_personnelFromState?._id}<br/>
-        Info: {_personnelFromState?.information}<br/>
-        Work Exp: {_personnelFromState.previousWorkExperience?.length}
-      </h2>
-      <button value="Add" type="button" onClick={addToWorkExperience}>
-        Add
-      </button>
-    </> */}
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -196,14 +191,7 @@ export default function Register() {
                   <FormLabel>Full name</FormLabel>
                   <FormControl>
                     <Input placeholder="Mobile Number" {...field} />
-                    {/* <PhoneInput
-                    inputStyle={{backgroundColor:"transparent",width:"100%", borderColor: "#e5e7eb"}}
-                    inputClass="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      country={'za'}
-                      value={mobile}
-                      onChange={phone => { setMobile(phone)}}
-                      placeholder="+27 123-4567"
-                    /> */}
+                 
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -226,7 +214,8 @@ export default function Register() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> 
+            
             <FormField
               control={form.control}
               name="companyNumber"
@@ -265,7 +254,7 @@ export default function Register() {
 
           <FormField
               control={form.control}
-              name="companyAdrress"
+              name="position"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Position</FormLabel>
@@ -276,7 +265,7 @@ export default function Register() {
                 </FormItem>
               )}
             />
-     <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6">
         
         <FormField
           control={form.control}
@@ -286,14 +275,6 @@ export default function Register() {
               <FormLabel>User email</FormLabel>
               <FormControl>
                 <Input placeholder="Enter your email" {...field} />
-                {/* <PhoneInput
-                inputStyle={{backgroundColor:"transparent",width:"100%", borderColor: "#e5e7eb"}}
-                inputClass="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  country={'za'}
-                  value={mobile}
-                  onChange={phone => { setMobile(phone)}}
-                  placeholder="+27 123-4567"
-                /> */}
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -325,7 +306,7 @@ export default function Register() {
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Confirm password"
+                  placeholder="Password"
                   type={"password"}
                   {...field}
                 />
@@ -336,7 +317,7 @@ export default function Register() {
         />
            <FormField
           control={form.control}
-          name="userNumber"
+          name="confirmPassword"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Confirm password.</FormLabel>

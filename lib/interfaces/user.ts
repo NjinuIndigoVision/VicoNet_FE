@@ -7,7 +7,7 @@ export interface IUserResponseModel{
       surname?	:string;
       email?	:string;	
       password?	:string;
-      type?:string;
+      type?: number;
       status?:string;
 }
 

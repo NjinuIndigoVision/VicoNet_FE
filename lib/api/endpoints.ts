@@ -16,7 +16,7 @@ import { GET, POST } from "./client";
 import { IResponseObject } from "./response";
 import { IProjectView } from "../interfaces/project";
 
-const url = "http://localhost:8081/api";
+const url = "http://localhost:8080/api";
 // export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
 
 export const Api = {
@@ -91,7 +91,7 @@ export const Api = {
   POST_RegisterCompany: async (
     payload: ICompanyRegisterModel
   ): Promise<IResponseObject<ICompanyRegisterResponseModel>> => {
-    const response = await POST(`${url}/users`, payload);
+    const response = await POST(`${url}/organisation`, payload);
     const _response = {
       error: response.status != 200,
       message: response.statusText,
@@ -142,6 +142,18 @@ export const Api = {
     return _response;
   },
 
+  GET_ProjectsByOrganisationId: async (organisationId: string): Promise<IResponseObject<IProjectView>> => {
+    const response = await GET(`${url}/project/${organisationId}`);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response,
+      status: response.status,
+    } as IResponseObject<IProjectView>;
+
+    return _response;
+  },
+
   GET_ShortlistPersonnel: async (staffId: string): Promise<IResponseObject<IPersonnel[]>> => {
     const response = await GET(`${url}/staff/shortlist/${staffId}`);
     const _response = {
@@ -182,7 +194,7 @@ export const Api = {
   },
 
   POST_Search: async (payload: any) => {
-    const response = await POST(`http://localhost:8081/api/searchPersonnel`, payload);
+    const response = await POST(`${url}/searchPersonnel`, payload);
     const _response = {
       error: response.status != 200,
       message: response.statusText,
