@@ -21,10 +21,10 @@ import { ArrowLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
 import { useDispatch, useSelector } from "react-redux";
-import { getPersonnel, setPersonnel } from "../../../lib/personnelSlice";
+import { getPersonnel, setPersonnel } from "../../../../lib/personnelSlice";
 import { IPersonnel } from "@/lib/interfaces/personnel";
 import { Api } from "@/lib/api/endpoints";
-import { ICompanyRegisterModel, IUserRegisterModel } from "@/lib/interfaces/user";
+import { ICompanyRegisterModel } from "../../../../lib/interfaces/company";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
