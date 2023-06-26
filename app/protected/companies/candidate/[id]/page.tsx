@@ -173,205 +173,240 @@ function page() {
   };
 
   return (
-    <div className="m-10 flex flex-row space-x-5">
-      <div className=" border-gray-100 h-fit rounded-lg shadow-sm shadow-gray-300 flex flex-col">
-        <div className="p-1 bg-pink-600 w-8 mt-4 rounded-r-md flex items-center">
-          <p style={{ fontSize: 8 }} className="text-white">
-            #1
-          </p>
-        </div>
-        <div className="p-10 flex flex-col items-center">
-          <Avatar className="w-32 h-32">
-            <AvatarFallback className="text-lg font-bold">
-              {loggedInUser?.firstName?.substring(0, 1) +
-                loggedInUser?.surname?.substring(0, 1)!}
-            </AvatarFallback>
-          </Avatar>
-          {user && (
-            <>
-              <div className="flex flex-row mt-2">
-                <p className="text-lg font-bold">
-                  {loggedInUser?.firstName} {loggedInUser?.surname}
-                </p>
-                <br />
-              </div>
-              <p className="text-gray-600 text-sm">1998-09-21</p>
-              <p className="text-gray-600 text-sm">+27670126726</p>
-              <p className="text-gray-600 text-sm">{loggedInUser.email}</p>
-
-              <br />
-              <p className="text-gray-600 text-sm">21 Jump St</p>
-              <p className="text-gray-600 text-sm">
-                {user.personalInformation.province},
-                {user.personalInformation.country}
-              </p>
-
-              <div className="flex flex-row">
-                <div className="px-2 m-1 flex items-center bg-gray-500 rounded-lg">
-                  <p style={{ fontSize: 10 }} className="text-white">
-                    Full Time
-                  </p>
+    <div className="talent-blue-header">
+      <div className="prof-container">
+        <div className="row">
+          <div className="col-lg-4">
+            <div className="white-container">
+              <div className="profile-info">
+                <label
+                  className="candnum"
+                  style={{ marginLeft: "-15px", fontSize: "14px" }}
+                >
+                  #1
+                </label>
+                <div className="personal-info">
+                  <div>
+                    <label className="l-14 pp-ini">RM</label>
+                  </div>
+                  <p className="l-18">Rendani Murokolo</p>
+                  <p className="p-14-n">1998-06-12</p>
+                  <p className="p-14-n">rendaniconstatia@gmail.com</p>
+                  <label className="l-14">Address</label>
+                  <p className="p-14-n">6570/6 clayville 45</p>
+                  <p className="p-14-n"></p>
+                  <p className="p-14-n">Gauteng</p>
+                  <p className="p-14-n">South Africa</p>
                 </div>
-                <div className="px-2 m-1 flex items-center bg-gray-500 rounded-lg">
-                  <p style={{ fontSize: 10 }} className="text-white">
-                    Remote
-                  </p>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-        <div className="mx-5 mt-2 bg-[#7878DA] p-3 cursor-pointer rounded-md flex flex-row space-x-2 text-white">
-          <PaperclipIcon />
-          <p>Download CV</p>
-        </div>
-        <div className="mx-5 mt-2 bg-[#27276C] p-3 cursor-pointer rounded-md flex flex-row justify-center space-x-2 text-white">
-          <p>Add to Shortlist</p>
-        </div>
-      </div>
 
-      <div className="p-10 border-gray-100 rounded-lg shadow-sm shadow-gray-300 flex flex-col flex-1">
-        {user && (
-          <>
-            <div className="flex flex-row mt-2 justify-between">
-              <div>
-                <p className="text-lg font-bold">
-                  About {loggedInUser?.firstName} {loggedInUser?.surname}
-                </p>
-                <p className="mt-2 text-gray-700 text-sm">
-                  {user.personalInformation?.about}
-                </p>
-              </div>
-            </div>
+                <div
+                  className="d-row"
+                  style={{ textAlign: "center", alignContent: "center" }}
+                >
+                  <label className="wtype">Remote</label>
+                </div>
 
-            <div className="flex flex-row mt-10 justify-between">
-              <div style={{ width: "100%" }}>
-                <p className="text-lg font-bold">
-                  <ClipboardCheck
-                    style={{ float: "left", marginRight: "2%" }}
-                  />{" "}
-                  Current Role and Responsibilities
-                </p>
-                <br />
-                <div className="flex flex-row mt-2 ml-5 items-center">
-                  <p className="mt-2  mx-5 text-gray-700 text-sm">
-                    Company name: {user.currentJob?.employer}
-                  </p>
-                </div>
-                <div className="flex flex-row mt-2  ml-5 items-center">
-                  <p className="mt-2 mx-5 text-gray-700 text-sm">
-                    Job title: {user.currentJob?.jobTitle}
-                  </p>
-                </div>
-                <div className="flex flex-row mt-2  ml-5 items-center">
-                  <p className="mt-2 mx-5 text-gray-700 text-sm">
-                    Starting Date:{" "}
-                    {moment(user?.currentJob?.startDate).format("MMMM d, YYYY")}
-                  </p>
-                </div>
-                <div className="flex flex-row mt-2 items-center"></div>
-                <br />
-              </div>
-            </div>
-            <hr />
-
-            <div className="flex flex-row mt-10 justify-between">
-              <div style={{ width: "100%" }}>
-                <p className="text-lg font-bold">
-                  <BriefcaseIcon style={{ float: "left", marginRight: "2%" }} />{" "}
-                  Previous Work Experience
-                </p>
-                {/* <p className="text-lg font-bold">
-                  <BriefcaseIcon /> Previous Work Experience
-                </p> */}
-                <br />
-                {user.previousWorkExperience?.map((item, i) => (
-                  <div className="flex flex-row mt-2  ml-5 items-center">
+                <a
+                  href="https://talent.viconetgroup.com/cv/1667407819.pdf"
+                  target="_blank"
+                  id="pdf_cv"
+                >
+                  <div
+                    className="person-frame"
+                    style={{ background: "#7878DA", display: "flex" }}
+                  >
                     <div>
-                      <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
-                        {item.employer} - {item.jobTitle} {"("}{" "}
-                        {moment(item.startDate).format("MMMM d, YYYY")} {"-"}{" "}
-                        {moment(item.endDate).format("MMMM d, YYYY")} {")"}
-                      </p>
-
-                      {item.responsibilities?.map((r, idx) => (
-                        <p className="mx-5 text-gray-400 text-xs">
-                          {"- "}
-                          {r.content}
-                        </p>
-                      ))}
+                      <img src="img/pdf2.svg" />
+                    </div>
+                    <div className="">
+                      <label
+                        className="l-18-n text-white"
+                        for="pdf_cv"
+                        style={{ margin: "10px 10px" }}
+                      >
+                        Download CV
+                      </label>
                     </div>
                   </div>
-                ))}
-                <br />
+                  <hr />
+                  <form method="post" id="myForm">
+                    <input
+                      type="hidden"
+                      name="c_email"
+                      value="rendaniconstatia@gmail.com"
+                    />
+                    <input type="hidden" name="cand_num" value="1" />{" "}
+                    <button
+                      className="bton btn2"
+                      type="button"
+                      id="shortlist_cand"
+                      style={{ width: "100%" }}
+                    >
+                      Add to shortlist
+                    </button>
+                  </form>
+                </a>
               </div>
             </div>
-            <hr />
-            <div className="flex flex-row mt-2 justify-between">
-              <div style={{ width: "100%" }}>
-                <p className="text-lg font-bold">
-                  <UserCheck style={{ float: "left", marginRight: "2%" }} />{" "}
-                  Skills
-                </p>
-                <br />
+          </div>
 
-                {/* <p className="mt-2 text-gray-700  ml-5 text-sm">
-                  {getOptionFromValue(user.keySkills ?? [], skills)?.map(
-                    (item, idx) => (
-                      <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
-                        {"- "} {item.label}
+          <div className="col-lg-8">
+            <div className="corp-edit">
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="d-flex">
+                    <div>
+                      <label className="rounddiv">
+                        <img src="img/about-icon.svg" />
+                      </label>
+                    </div>
+                    <div className="d-block">
+                      <label className="l-18-n">About Rendani Murokolo</label>
+                      <p className="p-14-n">This is the about</p>
+                    </div>
+                  </div>
+                  <hr />
+                </div>
+
+                <div className="col-lg-12">
+                  <div className="d-flex">
+                    <div>
+                      <label className="rounddiv">
+                        <img src="img/roles.svg" />
+                      </label>
+                    </div>
+                    <div className="d-block">
+                      <label className="l-18-n">
+                        CURRENT ROLE & RESPONSIBITY
+                      </label>
+                      <p className="p-14-n">Company Name : duduza united </p>
+                      <p className="p-14-n">Job Title : java dev </p>
+                      <p className="p-14-n">Starting Date : 2022-10-30 </p>
+
+                      <div className="d-flex flex-row justify-content-between">
+                        <span>
+                          <p>Key Roles :</p>
+                        </span>
+                      </div>
+                      <p style={{ marginTop: "-20px" }}>
+                        <div className="d-flex record user_roles">
+                          <div>
+                            <div
+                              className="bullet"
+                              style={{ marginTop: "10px" }}
+                            ></div>
+                          </div>
+                          <label>testing</label>
+                        </div>
                       </p>
-                    )
-                  )}
-                </p> */}
+                    </div>
+                  </div>
+                  <hr />
+                </div>
 
-                <div className="flex flex-row">
-                  <div className="px-2 m-1 flex items-center bg-gray-500 rounded-lg">
-                    <p style={{ fontSize: 10 }} className="text-white">
-                      Java
-                    </p>
+                <div className="col-lg-12">
+                  <div className="d-flex">
+                    <div>
+                      <label className="rounddiv">
+                        <img src="img/p-w-e-b.svg" />
+                      </label>
+                    </div>
+                    <div className="d-block">
+                      <label className="l-18-n">PREVIOUS WORK EXPERIENCE</label>
+                    </div>
                   </div>
-                  <div className="px-2 m-1 flex items-center bg-gray-500 rounded-lg">
-                    <p style={{ fontSize: 10 }} className="text-white">
-                      C#
-                    </p>
+                  <hr />
+                </div>
+
+                <div className="col-lg-12">
+                  <div className="d-flex">
+                    <div>
+                      <label className="rounddiv">
+                        <img src="img/exp-blue.svg" />
+                      </label>
+                    </div>
+                    <div className="d-block">
+                      <label className="l-18-n">YEARS OF EXPERIENCE</label>
+                      <p className="p-14-n"></p>
+                    </div>
                   </div>
-                  <div className="px-2 m-1 flex items-center bg-gray-500 rounded-lg">
-                    <p style={{ fontSize: 10 }} className="text-white">
-                      Information Technology
-                    </p>
+                  <hr />
+                </div>
+
+                <div className="col-lg-12">
+                  <div className="d-flex">
+                    <div>
+                      <label className="rounddiv">
+                        <img src="img/edu-blue.svg" />
+                      </label>
+                    </div>
+                    <div className="d-block">
+                      <label className="l-18-n">EDUCATION</label>
+                      <div>
+                        <label className="p-14">bsc IT</label>
+                        <div className="d-flex">
+                          <div>
+                            <div className="bullet mt-1"></div>
+                          </div>
+                          <p className="p-14-n">
+                            <strong>Institute : </strong>richfield
+                          </p>
+                        </div>
+                        <div className="d-flex">
+                          <div>
+                            <div className="bullet mt-1"></div>
+                          </div>
+                          <p className="p-14-n">
+                            <strong>Year completed : </strong>2019
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="px-2 m-1 flex items-center bg-gray-500 rounded-lg">
-                    <p style={{ fontSize: 10 }} className="text-white">
-                      Amazon Web Services
-                    </p>
+                  <hr />
+                </div>
+                <div className="col-lg-12">
+                  <div className="d-flex">
+                    <div>
+                      <label className="rounddiv">
+                        <img src="img/key-course-blue.svg" />
+                      </label>
+                    </div>
+                    <div className="d-block">
+                      <label className="l-18-n">KEY COURSES</label>
+
+                      <div className="d-flex">
+                        <div>
+                          <div className="bullet"></div>
+                        </div>
+                        <div className="lft-text">
+                          <p className="move-up p-14-n">software dev</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <br />
+                <div className="col-lg-12">
+                  <div className="d-flex">
+                    <div>
+                      <label className="rounddiv">
+                        <img src="img/skills-blue.svg" />
+                      </label>
+                    </div>
+                    <div className="d-block">
+                      <label className="l-18-n">KEY SKILLS </label>
+                      <div className="s-around">
+                        <div className="row">
+                          <p className="move-up p-14-n skillfrm">java</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <hr />
-            <div className="flex flex-row mt-2 justify-between">
-              <div style={{ width: "100%" }}>
-                <p className="text-lg font-bold">
-                  <BookOpenCheck style={{ float: "left", marginRight: "2%" }} />{" "}
-                  Key Courses
-                </p>
-                <br />
-                <p className="mt-2 text-gray-700 text-sm ml-5">
-                  {getOptionFromValue(user.keyCourses ?? [], courses)?.map(
-                    (item, idx) => (
-                      <p className="mt-2 mx-5 text-gray-700 font-boild text-sm">
-                        {"- "} {item.label}
-                      </p>
-                    )
-                  )}
-                </p>
-                <br />
-              </div>
-            </div>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
