@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Api } from "@/lib/api/endpoints";
 import { IPersonnel } from "@/lib/interfaces/personnel";
-import { IProjectView } from "@/lib/interfaces/project";
+import { IProject, IProjectView, IUpdateProjectPersonnel } from "@/lib/interfaces/project";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -22,6 +22,10 @@ import { Label } from "@radix-ui/react-label";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getOptionFromValue, skills } from "@/lib/data";
+import { IStaffViewModel } from "@/lib/interfaces/staff";
+import Cookies from "universal-cookie";
+import { IUserResponseModel } from "@/lib/interfaces/user";
+import { rejects } from "assert";
 
 function page() {
 
@@ -32,22 +36,46 @@ const [declined, setDeclined] = useState<IPersonnel[]>();
 
 const [project, setProject] = useState<IProjectView>();
 const [activeTab, setActiveTab] = useState<number>(0);
+const [staffUser, setStaffUser] = useState<IStaffViewModel>();
+
+const [selectedPersonnel, setSelectedPersonnel] = useState<string[]>([]);
 
 	
+const cookies = new Cookies();
 const getProject =async (projectId:string)=>{
 
 	const response = await Api.GET_ProjectById(projectId);
-	
-		console.log("RPPEEW",response)
-		setPending(response?._pending.filter(x=>x!=null));
-		setAccepted(response?._accepted.filter(x=>x!=null));
-		setDeclined(response?._declined.filter(x=>x!=null));
-		setProject(response);
-	  
+	console.log("PRODD", response)
+	scaffold(response);
 }
 
+
+const scaffold=(response:IProjectView)=>{
+
+	setPending(response?._pending.filter(x=>x!=null));
+	setAccepted(response?._accepted.filter(x=>x!=null));
+	setDeclined(response?._declined.filter(x=>x!=null));
+	setProject(response);
+
+}
+
+const getStaffUser =async (userId:string):Promise<IStaffViewModel>=>{
+
+    const response = await Api.GET_StaffUserById(userId);
+   return response;
+  
+}
+  
+
 useEffect(() => {
+
 	getProject("64988373fff3bcecf3399ed5");
+
+	const staffUser = cookies.get('viconet-user') as IUserResponseModel;
+	getStaffUser(staffUser._id??"").then(x=>{
+		setStaffUser(x);
+	})
+
   }, []);
   
 const search =async (key:string)=>{
@@ -57,18 +85,47 @@ const search =async (key:string)=>{
 	setSearchResults(response.data);
 }
 
-const shortlist =async (key:string)=>{
+const shortlist =async (personnelId:string)=>{
+	const response = await Api.GET_ShortlistPersonnel( staffUser?.staff._id??"",personnelId);
+	setStaffUser(response as IStaffViewModel)
+	
+}
 
-	const response = await Api.POST_Search(key);
-	console.log("Res", response);
-	setSearchResults(response.data);
+const removeFromShortList =async (personnelId:string)=>{
+	const response = await Api.GET_UnShortlistPersonnel(staffUser?.staff._id??"", personnelId);
+	setStaffUser(response as IStaffViewModel)
 }
 
 
+const addToProject = async (personnelId:string)=>{
+
+	const request = {
+			projectId:"64988373fff3bcecf3399ed5",
+			personnelId:personnelId,
+			status:"0",
+			staffId:staffUser?.staff._id	
+		} as IUpdateProjectPersonnel
+
+	//send array. instead of looping: NK 
+	
+	const projectView = await Api.POST_UpdateProjectPersonnel(request) ;
+	console.log("pro", projectView);
+	const _proj = projectView.data as IProjectView;	
+	scaffold(_proj);
+	//remove from shortlist
+	
+	const newShortlisted = staffUser?.shortlisted.filter(x=>x._id.toString() != personnelId);
+	const newStaff={...staffUser, shortlisted:newShortlisted} as IStaffViewModel;
+
+	setStaffUser(newStaff);
+}
+
   return (
 
-	
-	<div className="talent-blue-header">
+	project == undefined? 
+		<>Loading..</>:
+		<>
+			<div className="talent-blue-header">
 		<div className="prof-container">
 			<div className="row">
 				<div className="col-lg-3">
@@ -86,8 +143,8 @@ const shortlist =async (key:string)=>{
 						</div>
 						<hr/> 
 						<AlertDialog>
-							<AlertDialogTrigger>
-							<button className="modal-open bton btn2" data-modal= "addCandidates" style={{width:"100%"}}>Add Talents</button>
+							<AlertDialogTrigger style={{width:"100%"}}>
+							<button className="modal-open bton btn2" data-modal= "addCandidates" style={{width:"100%"}}>Add Talent</button>
 							</AlertDialogTrigger>
 							<AlertDialogContentFull>
 								<AlertDialogTitle>
@@ -124,19 +181,36 @@ const shortlist =async (key:string)=>{
 														<div className="rw1">
 															<div className="d-flex justify-content-between">
 																<label className="candnum">#1</label>
-																	<button className="bton btn4 addcand" title="Click to shortlist" id="1300">
+																	
+																	{staffUser?.staff._shortlist.includes(x._id)?
+																	
+																		<button className="bton btn4 addcand" onClick={()=>{removeFromShortList(x._id)}} title="Click to shortlist" id="1300">
+																		UN-shortlist
+																	</button>
+																	:
+																	<button className="bton btn4 addcand" onClick={()=>{shortlist(x._id)}} title="Click to shortlist" id="1300">
 																		Shortlist
 																	</button>
+																	}
+																
 																		
 																
 															</div>
-															<a href="view-profile?id=79d687136cdee75335dbe8e5ba6cac00&amp;num=1" target="_blank">
+															{/* <h1>Selected {selectedPersonnel.join(",")}</h1> */}
+															<a>
+																{/* <button onClick={()=>{
+																console.log("curr",selectedPersonnel)
+
+															selectedPersonnel.includes(x._id)? 
+															setSelectedPersonnel(selectedPersonnel.filter(sel=>sel!=x._id)): 
+															setSelectedPersonnel([...selectedPersonnel, x._id])
+															}}>Select</button> */}
 															<div className="toprow">							
 																<div className="prof-img">
 																	<img src="img/user.svg"/>
 																</div>	
 																<div className="prof-det pers-det">
-																	<label className="l-14 text-black">{x.personalInformation?.name} {x.personalInformation?.surname}</label>
+																	<label className="l-1)4 text-black">{x.personalInformation?.name} {x.personalInformation?.surname}</label>
 																	<p className="p-2" style={{marginTop: "-7px"}}></p>
 																	<div className="d-flex flex-row justify-content-between">
 																		<p className="p-2" style={{marginTop: "-15px"}}>{x.personalInformation?.name}</p>
@@ -159,14 +233,7 @@ const shortlist =async (key:string)=>{
 																				{getOptionFromValue(x.keySkills??[], skills).map(y=>
 																				 <p>{y.label}</p>
 																				)}
-																			{/* <p className="p-12 skillfrm">it project management  </p>
-																				<p className="p-12 skillfrm">c++ </p>
-																				<p className="p-12 skillfrm">c# .net </p>
-																				<p className="p-12 skillfrm">sql </p>
-																				<p className="p-12 skillfrm">java </p>
-																				<p className="p-12 skillfrm">html </p>
-																				<p className="p-12 skillfrm">css </p>
-																				<p className="p-12 skillfrm">javascript </p> */}
+																			
 																		</div>
 																		</div>
 																	</div>	
@@ -202,90 +269,9 @@ const shortlist =async (key:string)=>{
 									)})}
 									
 
-									{/* <div className="col-lg-6 box hide show">
-													
-										<div className="person-frame2">
-											<div className="rw1">
-												<div className="d-flex justify-content-between">
-													<label className="candnum">#1</label>
-														<button className="bton btn4 addcand" title="Click to shortlist" id="1300">
-															Shortlist
-														</button>
-															
-													
-												</div>
-												<a href="view-profile?id=79d687136cdee75335dbe8e5ba6cac00&amp;num=1" target="_blank">
-												<div className="toprow">							
-													<div className="prof-img">
-																							<img src="img/user.svg"/>
-																						</div>	
-													<div className="prof-det pers-det">
-														<label className="l-14 text-black">Mulisa Musehane</label>
-														<p className="p-2" style={{marginTop: "-7px"}}></p>
-														<div className="d-flex flex-row justify-content-between">
-															<p className="p-2" style={{marginTop: "-15px"}}>South Africa</p>
-															<div style={{marginTop: "-17px"}}>
-																<label className="wtype">Full time</label>
-																	<label className="wtype">Remote</label>
-																</div>
-															</div>
-														</div>
-													</div>
-												</a>
-											</div><a href="view-profile?id=79d687136cdee75335dbe8e5ba6cac00&amp;num=1" target="_blank">
-											<div className="abtcand">
-												<div className="blog-flex">
-													<div>
-														<label className="roundfrm"><img src="img/skills-blue.svg"/></label>
-													</div>
-													<div className="ml-2"><label className="l-12">SKills</label>
-														<div style={{marginLeft:"13px",marginRight:" 13px"}}>
-															<div className="row">
-															<p className="p-12 skillfrm">it project management  </p>
-																<p className="p-12 skillfrm">c++ </p>
-																<p className="p-12 skillfrm">c# .net </p>
-																<p className="p-12 skillfrm">sql </p>
-																<p className="p-12 skillfrm">java </p>
-																<p className="p-12 skillfrm">html </p>
-																<p className="p-12 skillfrm">css </p>
-																<p className="p-12 skillfrm">javascript </p>
-														</div>
-														</div>
-													</div>	
-												</div>
-												<hr/>
-												<div className="blog-flex">
-													<div>
-														<label className="roundfrm"><img src="img/roles.svg"/></label>
-													</div>
-													<div className="ml-2"><label className="l-12">Roles</label>
-														<div className="blog-flex roleslim">						
-															<p className="p-12">							 		
-															</p>								 	
-														</div>
-													</div>	
-												</div>
-												<hr/>
-												<div className="blog-flex">
-													<div>
-														<label className="roundfrm"><img src="img/edu-blue.svg"/></label>
-													</div>
-													<div className="ml-2"><label className="l-12">Qualifications</label>
-														<div className="blog-flex mb-3">
-																<p className="p-12">bsc information and knowledge systems  ,university of pretoria  </p>
-														</div>
-													</div>	
-												</div>
-											</div>
-											</a>
-										</div>																							
-									</div> */}
-
-									
-																						
+																		
 									</div>
 									<hr/>
-									<button type="button" id="<?php echo 'form'.$x; ?>" onClick={()=>{}} className="bton btn1 mr-0 d-block ml-auto invite">Invite</button>
 								</div>
 
 								</div>
@@ -315,16 +301,16 @@ const shortlist =async (key:string)=>{
 					<p className="p-14-n">{project?.description}</p>
 					
 					<div className="ptabsbg">
-						<button onClick={()=>{setActiveTab(0)}} className= {activeTab==0?"bton btn4 tab-btn active":"bton btn4 tab-btn "} id="defaultOpen">Shortlisted  <label className="comp-status mt-1" style={{background: "#FF8EBD"}}  id="del0">2</label>	</button>
-						<button onClick={()=>{setActiveTab(1)}} className={activeTab==1?"bton btn4 tab-btn active" :"bton btn4 tab-btn "} >Pending   <label className="comp-status mt-1" style={{background: "#FF8EBD"}}  onClick={()=>{setActiveTab(0)}} id="del1">1</label>	</button> 
-						<button onClick={()=>{setActiveTab(2)}} className={activeTab==2?"bton btn4 tab-btn active" :"bton btn4 tab-btn "} >Accepted   <label className="comp-status mt-1" style={{background: "#FF8EBD"}} onClick={()=>{setActiveTab(1)}} id="del2">1</label>	</button>
-						<button onClick={()=>{setActiveTab(3)}} className={activeTab==3?"bton btn4 tab-btn active" :"bton btn4 tab-btn "} >Declined <label className="comp-status mt-1" style={{background: "#FF8EBD"}} onClick={()=>{setActiveTab(2)}} id="del3">2</label>	</button>
+						<button onClick={()=>{setActiveTab(0)}} className= {activeTab==0?"bton btn4 tab-btn active":"bton btn4 tab-btn "} id="defaultOpen">Shortlisted  <label className="comp-status mt-1" onClick={()=>{setActiveTab(0)}}  style={{background: "#FF8EBD"}}  id="del0">{staffUser?.shortlisted.length}</label>	</button>
+						<button onClick={()=>{setActiveTab(1)}} className={activeTab==1?"bton btn4 tab-btn active" :"bton btn4 tab-btn "} >Pending   <label className="comp-status mt-1" style={{background: "#FF8EBD"}}  onClick={()=>{setActiveTab(1)}} id="del1">{pending?.length??"0"}</label>	</button> 
+						<button onClick={()=>{setActiveTab(2)}} className={activeTab==2?"bton btn4 tab-btn active" :"bton btn4 tab-btn "} >Accepted   <label className="comp-status mt-1" style={{background: "#FF8EBD"}} onClick={()=>{setActiveTab(2)}} id="del2">{accepted?.length??"0"}</label>	</button>
+						<button onClick={()=>{setActiveTab(3)}} className={activeTab==3?"bton btn4 tab-btn active" :"bton btn4 tab-btn "} >Declined <label className="comp-status mt-1" style={{background: "#FF8EBD"}} onClick={()=>{setActiveTab(3)}} id="del3">{declined?.length??"0"}</label>	</button>
 					</div>
 						<div id="<?php echo $value ?>" className="tab-content" style={{display: activeTab==0 ?"block":""}}>
 							<div className="row">
 									<div className="d-flex justify-content-between pdiv" style={{width:"100%", margin: "2%", background:"#DFDFDF", marginTop: "10px"}}>
 										
-										<div className="work-type" style={{marginTop:"5px;"}}>
+										<div className="work-type" style={{marginTop:"5px"}}>
 											<label className="wpl text-black" >
 												<input type="checkbox" value="part" name="[]" className="wpc" id="<?php echo $selectId ?>" onClick={()=>{}}/>
 												<div className="wpc-box">						
@@ -341,7 +327,9 @@ const shortlist =async (key:string)=>{
 								
 									<div className="row mt-3">
 									
-										<div className="col-lg-6 shortCand">						
+									{
+										staffUser?.shortlisted.map(x=><>
+												<div className="col-lg-6 shortCand">						
 											<div className="person-frame boarder-blue">
 												<div className="d-flex justify-content-between">
 													
@@ -355,42 +343,22 @@ const shortlist =async (key:string)=>{
 															<img src="img/user.svg" alt="pp" id="cand_pp"/>									
 														</div>	
 														<div className="prof-det pers-det">
-															<label className="l-14 text-black">.surname</label>
-															<p className="p-2" style={{marginTop: "-5px;"}}>.name </p>
-															<p className="p-2" style={{marginTop: "-15px;"}}>country </p>
+															<label className="l-14 text-black"> {x.personalInformation.surname}</label>
+															<p className="p-2" style={{marginTop: "-5px"}}>{x.personalInformation.name} </p>
+															<p className="p-2" style={{marginTop: "-15px"}}>{x.personalInformation.country} </p>
 															<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
 																<label className="wtype">Remote</label>
 															</div>
 														</div>
 													</div>					
 												</div>
+												<button type="button" id="<?php echo 'form'.$x; ?>" onClick={()=>{addToProject(x._id.toString())}} className="bton btn1 mr-0 d-block ml-auto invite">Invite</button>
+							
 											</div>
 										</div>
-										<div className="col-lg-6 shortCand">						
-											<div className="person-frame boarder-blue">
-												<div className="d-flex justify-content-between">
-													
-													<div className="rem-cand1" id="<?php echo $row['id'].'-'.$delNum ?>">
-														<img src="img/rounddel.svg"/>
-													</div>							
-												</div>
-												<div className="d-flex flex-row justify-content-between">
-													<div className="d-flex">
-														<div className="prof-img">
-															<img src="img/user.svg" alt="pp" id="cand_pp"/>									
-														</div>	
-														<div className="prof-det pers-det">
-															<label className="l-14 text-black">.surname</label>
-															<p className="p-2" style={{marginTop: "-5px;"}}>.name </p>
-															<p className="p-2" style={{marginTop: "-15px;"}}>country </p>
-															<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
-																<label className="wtype">Remote</label>
-															</div>
-														</div>
-													</div>					
-												</div>
-											</div>
-										</div>
+										</>)
+									}
+								
 									</div>
 									<hr/>
 									<button type="button" id="<?php echo 'form'.$x; ?>" onClick={()=>{}} className="bton btn1 mr-0 d-block ml-auto invite">Invite</button>
@@ -432,8 +400,8 @@ const shortlist =async (key:string)=>{
 																</div>	
 																<div className="prof-det pers-det">
 																	<label className="l-14 text-black">{x.personalInformation.name} {x.personalInformation.surname}</label>
-																	<p className="p-2" style={{marginTop: "-5px;"}}>{x.personalInformation.name} </p>
-																	<p className="p-2" style={{marginTop: "-15px;"}}>{x.personalInformation.country} </p>
+																	<p className="p-2" style={{marginTop: "-5px"}}>{x.personalInformation.name} </p>
+																	<p className="p-2" style={{marginTop: "-15px"}}>{x.personalInformation.country} </p>
 																	<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
 																		<label className="wtype">Remote</label>
 																	</div>
@@ -469,7 +437,7 @@ const shortlist =async (key:string)=>{
 									<input type="hidden" name="receiptId" value="<?php echo $row['receipt_id'] ?>"/>
 								
 									<div className="row mt-3">
-										{pending?.map((x)=>{
+										{accepted?.map((x)=>{
 											return (
 												<div className="col-lg-6 shortCand">						
 													<div className="person-frame boarder-blue">
@@ -486,8 +454,62 @@ const shortlist =async (key:string)=>{
 																</div>	
 																<div className="prof-det pers-det">
 																	<label className="l-14 text-black">{x.personalInformation.name} {x.personalInformation.surname}</label>
-																	<p className="p-2" style={{marginTop: "-5px;"}}>{x.personalInformation.name} </p>
-																	<p className="p-2" style={{marginTop: "-15px;"}}>{x.personalInformation.country} </p>
+																	<p className="p-2" style={{marginTop: "-5px"}}>{x.personalInformation.name} </p>
+																	<p className="p-2" style={{marginTop: "-15px"}}>{x.personalInformation.country} </p>
+																	<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
+																		<label className="wtype">Remote</label>
+																	</div>
+																</div>
+															</div>					
+														</div>
+													</div>
+												</div>
+											)
+										})}
+									
+									</div>
+									<hr/>
+									<button type="button" id="<?php echo 'form'.$x; ?>" onClick={()=>{}} className="bton btn1 mr-0 d-block ml-auto invite">Invite</button>
+								</form>
+						</div> 
+						<div id="<?php echo $value ?>" className="tab-content" style={{display: activeTab==3 ?"block":""}}>
+							<div className="row">
+									<div className="d-flex justify-content-between pdiv" style={{width:"100%", margin: "2%", background:"#DFDFDF", marginTop: "10px"}}>
+										
+										<div className="work-type" style={{marginTop:"5px;"}}>
+											<label className="wpl text-black" >
+												<input type="checkbox" value="part" name="[]" className="wpc" id="<?php echo $selectId ?>" onClick={()=>{}}/>
+												<div className="wpc-box">						
+												</div>Select all
+											</label>
+										</div>
+									</div>
+								</div>
+								
+								<form id="<?php echo 'form'.$x;?>" method="post">
+									<input type="hidden" name="id" value="Invite"/>
+									<input type="hidden" name="receiptId" value="<?php echo $row['receipt_id'] ?>"/>
+								
+									<div className="row mt-3">
+										{declined?.map((x)=>{
+											return (
+												<div className="col-lg-6 shortCand">						
+													<div className="person-frame boarder-blue">
+														<div className="d-flex justify-content-between">
+															
+															<div className="rem-cand1" id="<?php echo $row['id'].'-'.$delNum ?>">
+																<img src="img/rounddel.svg"/>
+															</div>							
+														</div>
+														<div className="d-flex flex-row justify-content-between">
+															<div className="d-flex">
+																<div className="prof-img">
+																	<img src="img/user.svg" alt="pp" id="cand_pp"/>									
+																</div>	
+																<div className="prof-det pers-det">
+																	<label className="l-14 text-black">{x.personalInformation.name} {x.personalInformation.surname}</label>
+																	<p className="p-2" style={{marginTop: "-5px"}}>{x.personalInformation.name} </p>
+																	<p className="p-2" style={{marginTop: "-15px"}}>{x.personalInformation.country} </p>
 																	<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
 																		<label className="wtype">Remote</label>
 																	</div>
@@ -509,6 +531,10 @@ const shortlist =async (key:string)=>{
 			</div>
 		</div>
 	</div>
+		
+		</>
+	
+
 
 )
 }

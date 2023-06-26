@@ -22,6 +22,8 @@ import { Label } from "@radix-ui/react-label";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import { IOrganisation, IOrganisationViewModel } from "@/lib/interfaces/company";
+import Cookies from "universal-cookie";
+import { IUserResponseModel } from "@/lib/interfaces/user";
 
 function page() {
 	
@@ -35,7 +37,7 @@ const [activeTab, setActiveTab] = useState<number>(0);
 const [projectName, setProjectName] = useState<string>("");
 const [projectDescription, setProjectDescription] = useState<string>("");
 
-	
+const cookies = new Cookies();
 const getOrg =async (organisation:string)=>{
 
 	const response = await Api.GET_OrganisationById(organisation);
@@ -49,8 +51,16 @@ const getOrg =async (organisation:string)=>{
 
 }
 
+
 useEffect(() => {
+	const isLoggedIn = cookies.get('viconet-user') ;
+	const loggedInObject = isLoggedIn as IUserResponseModel;
+	const staffDetails = cookies.get('viconet-staff') ;
+	console.log("loggedinusr", loggedInObject)
+	console.log("staffDetails", staffDetails)
+	
 	getOrg("649850f7357c74b4d756f570");
+
   }, []);
   
 

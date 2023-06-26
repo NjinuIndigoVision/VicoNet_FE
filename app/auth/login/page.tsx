@@ -92,7 +92,8 @@ async function Redirect(){
        cookies.set('viconet-user', response?.data as any, { path: '/' });
 
       await localStorage.setItem("user", JSON.stringify(response.data));
-      router.replace("/protected/createProfile/about");
+      
+     
       toast.update(_id, {
         render: "Logged in successfully",
         type: "success",
@@ -100,10 +101,18 @@ async function Redirect(){
         autoClose: 2000,
       });
 
-      response.data?.type== 2 ? router.replace("/protected/companies/projects") : router.replace("/protected/createProfile/about");
+      if(response.data?.type== 2){
+        // getStaffUser(response.data._id??"");
+         router.replace("/protected/companies/projects") }
+         else{
+          router.replace("/protected/createProfile/about");
+         } 
+   
     }
   }
 
+  
+  
   const saveCV = (e: any) => {
     setCV(e.target.files[0]);
     console.log(cv);

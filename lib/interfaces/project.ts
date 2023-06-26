@@ -7,6 +7,13 @@ export interface ICreateProject{
   description:string;  
 }
 
+export interface IUpdateProjectPersonnel{
+  projectId:string;
+  personnelId:string;  
+  status:string;
+}
+
+
 
 export interface IProjectView extends IProject {
   _uninvited:IPersonnel[];
@@ -14,6 +21,14 @@ export interface IProjectView extends IProject {
   _declined:IPersonnel[];
   _accepted:IPersonnel[];
 }
+
+export interface IUpdateProjectPersonnel{
+  projectId:string;
+  personnelId:string;  
+  status:string;  
+  staffId:string;
+}
+
 
 export interface ICreateProject{
   _organisation:string;
