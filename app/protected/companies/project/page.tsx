@@ -21,47 +21,49 @@ import {
 import { Label } from "@radix-ui/react-label";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getOptionFromValue, skills } from "@/lib/data";
 
 function page() {
-	
+
+const [searchResult, setSearchResults] = useState<IPersonnel[]>();
 const [pending, setPending] = useState<IPersonnel[]>();
 const [accepted, setAccepted] = useState<IPersonnel[]>();
 const [declined, setDeclined] = useState<IPersonnel[]>();
+
+const [project, setProject] = useState<IProjectView>();
 const [activeTab, setActiveTab] = useState<number>(0);
+
 	
-const getCompanies =async (projectId:string)=>{
+const getProject =async (projectId:string)=>{
 
 	const response = await Api.GET_ProjectById(projectId);
-	if(response.error){
-		alert("err")
-	}else{
-		setPending(response.data?._pending);
-		setAccepted(response.data?._accepted);
-		setDeclined(response.data?._declined);
-	}
-
-	useEffect(() => {
-		getCompanies("");
-	  }, []);
+	
+		console.log("RPPEEW",response)
+		setPending(response?._pending.filter(x=>x!=null));
+		setAccepted(response?._accepted.filter(x=>x!=null));
+		setDeclined(response?._declined.filter(x=>x!=null));
+		setProject(response);
 	  
 }
 
+useEffect(() => {
+	getProject("64988373fff3bcecf3399ed5");
+  }, []);
+  
 const search =async (key:string)=>{
 
-	const response = await Api.GET_ProjectById(key);
-	if(response.error){
-		alert("err")
-	}else{
-		setPending(response.data?._pending);
-		setAccepted(response.data?._accepted);
-		setDeclined(response.data?._declined);
-	}
-
-	useEffect(() => {
-		getCompanies("");
-	  }, []);
-	  
+	const response = await Api.POST_Search(key);
+	console.log("Res", response);
+	setSearchResults(response.data);
 }
+
+const shortlist =async (key:string)=>{
+
+	const response = await Api.POST_Search(key);
+	console.log("Res", response);
+	setSearchResults(response.data);
+}
+
 
   return (
 
@@ -102,7 +104,7 @@ const search =async (key:string)=>{
 									
 									</div>
 									<div className="col-md-2">
-									<Button onClick={()=>{}} className="bg-[#E2186D]">
+									<Button onClick={()=>{search("")}} className="bg-[#E2186D]">
 										Search
 									</Button>
 									</div>
@@ -114,86 +116,93 @@ const search =async (key:string)=>{
 									<input type="hidden" name="receiptId" value="<?php echo $row['receipt_id'] ?>"/>
 								
 									<div className="row mt-3">
-									
-									<div className="col-lg-6 box hide show">
+									{ searchResult?.map(x=>{ return(
+										<>
+										<div className="col-lg-6 box hide show">
 													
-										<div className="person-frame2">
-											<div className="rw1">
-												<div className="d-flex justify-content-between">
-													<label className="candnum">#1</label>
-														<button className="bton btn4 addcand" title="Click to shortlist" id="1300">
-															Shortlist
-														</button>
-															
-													
-												</div>
-												<a href="view-profile?id=79d687136cdee75335dbe8e5ba6cac00&amp;num=1" target="_blank">
-												<div className="toprow">							
-													<div className="prof-img">
-																							<img src="img/user.svg"/>
-																						</div>	
-													<div className="prof-det pers-det">
-														<label className="l-14 text-black">Mulisa Musehane</label>
-														<p className="p-2" style={{marginTop: "-7px"}}></p>
-														<div className="d-flex flex-row justify-content-between">
-															<p className="p-2" style={{marginTop: "-15px"}}>South Africa</p>
-															<div style={{marginTop: "-17px"}}>
-																<label className="wtype">Full time</label>
-																	<label className="wtype">Remote</label>
+													<div className="person-frame2">
+														<div className="rw1">
+															<div className="d-flex justify-content-between">
+																<label className="candnum">#1</label>
+																	<button className="bton btn4 addcand" title="Click to shortlist" id="1300">
+																		Shortlist
+																	</button>
+																		
+																
+															</div>
+															<a href="view-profile?id=79d687136cdee75335dbe8e5ba6cac00&amp;num=1" target="_blank">
+															<div className="toprow">							
+																<div className="prof-img">
+																	<img src="img/user.svg"/>
+																</div>	
+																<div className="prof-det pers-det">
+																	<label className="l-14 text-black">{x.personalInformation?.name} {x.personalInformation?.surname}</label>
+																	<p className="p-2" style={{marginTop: "-7px"}}></p>
+																	<div className="d-flex flex-row justify-content-between">
+																		<p className="p-2" style={{marginTop: "-15px"}}>{x.personalInformation?.name}</p>
+																		<div style={{marginTop: "-17px"}}>
+																			<label className="wtype">Full time</label>
+																				<label className="wtype">Remote</label>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</a></div><a href="view-profile?id=79d687136cdee75335dbe8e5ba6cac00&amp;num=1" target="_blank">
+															<div className="abtcand">
+																<div className="blog-flex">
+																	<div>
+																		<label className="roundfrm"><img src="img/skills-blue.svg"/></label>
+																	</div>
+																	<div className="ml-2"><label className="l-12">SKills</label>
+																		<div style={{marginLeft:"13px",marginRight:" 13px"}}>
+																			<div className="row">
+																				{getOptionFromValue(x.keySkills??[], skills).map(y=>
+																				 <p>{y.label}</p>
+																				)}
+																			{/* <p className="p-12 skillfrm">it project management  </p>
+																				<p className="p-12 skillfrm">c++ </p>
+																				<p className="p-12 skillfrm">c# .net </p>
+																				<p className="p-12 skillfrm">sql </p>
+																				<p className="p-12 skillfrm">java </p>
+																				<p className="p-12 skillfrm">html </p>
+																				<p className="p-12 skillfrm">css </p>
+																				<p className="p-12 skillfrm">javascript </p> */}
+																		</div>
+																		</div>
+																	</div>	
+																</div>
+																<hr/>
+																<div className="blog-flex">
+																	<div>
+																		<label className="roundfrm"><img src="img/roles.svg"/></label>
+																	</div>
+																	<div className="ml-2"><label className="l-12">Roles</label>
+																		<div className="blog-flex roleslim">						
+																			<p className="p-12">							 		
+																			</p>								 	
+																		</div>
+																	</div>	
+																</div>
+																<hr/>
+																<div className="blog-flex">
+																	<div>
+																		<label className="roundfrm"><img src="img/edu-blue.svg"/></label>
+																	</div>
+																	<div className="ml-2"><label className="l-12">Qualifications</label>
+																		<div className="blog-flex mb-3">
+																				<p className="p-12">bsc information and knowledge systems  ,university of pretoria  </p>
+																		</div>
+																	</div>	
 																</div>
 															</div>
-														</div>
-													</div>
-												</a></div><a href="view-profile?id=79d687136cdee75335dbe8e5ba6cac00&amp;num=1" target="_blank">
-												<div className="abtcand">
-													<div className="blog-flex">
-														<div>
-															<label className="roundfrm"><img src="img/skills-blue.svg"/></label>
-														</div>
-														<div className="ml-2"><label className="l-12">SKills</label>
-															<div style={{marginLeft:"13px",marginRight:" 13px"}}>
-																<div className="row">
-																<p className="p-12 skillfrm">it project management  </p>
-																	<p className="p-12 skillfrm">c++ </p>
-																	<p className="p-12 skillfrm">c# .net </p>
-																	<p className="p-12 skillfrm">sql </p>
-																	<p className="p-12 skillfrm">java </p>
-																	<p className="p-12 skillfrm">html </p>
-																	<p className="p-12 skillfrm">css </p>
-																	<p className="p-12 skillfrm">javascript </p>
-															</div>
-															</div>
-														</div>	
-													</div>
-													<hr/>
-													<div className="blog-flex">
-														<div>
-															<label className="roundfrm"><img src="img/roles.svg"/></label>
-														</div>
-														<div className="ml-2"><label className="l-12">Roles</label>
-															<div className="blog-flex roleslim">						
-																<p className="p-12">							 		
-																</p>								 	
-															</div>
-														</div>	
-													</div>
-													<hr/>
-													<div className="blog-flex">
-														<div>
-															<label className="roundfrm"><img src="img/edu-blue.svg"/></label>
-														</div>
-														<div className="ml-2"><label className="l-12">Qualifications</label>
-															<div className="blog-flex mb-3">
-																	<p className="p-12">bsc information and knowledge systems  ,university of pretoria  </p>
-															</div>
-														</div>	
-													</div>
+															</a>
+														</div>																							
 												</div>
-												</a>
-											</div>																							
-									</div>
+										</>
+									)})}
+									
 
-									<div className="col-lg-6 box hide show">
+									{/* <div className="col-lg-6 box hide show">
 													
 										<div className="person-frame2">
 											<div className="rw1">
@@ -270,7 +279,7 @@ const search =async (key:string)=>{
 											</div>
 											</a>
 										</div>																							
-									</div>
+									</div> */}
 
 									
 																						
@@ -300,10 +309,10 @@ const search =async (key:string)=>{
 							<a href="#" className="modal-open" data-modal = "modal7"><img src="img/edit-text.svg" className="edit-tab"/></a>
 					</div>
 					<hr/>
-					<label className="l-14">Project Name</label>
-					<p className="p-14-n">Name</p>
+					<label className="l-14">Name</label>
+					<p className="p-14-n">{project?.name}</p>
 					<label className="l-14">Project Description</label>
-					<p className="p-14-n">Desc</p>
+					<p className="p-14-n">{project?.description}</p>
 					
 					<div className="ptabsbg">
 						<button onClick={()=>{setActiveTab(0)}} className= {activeTab==0?"bton btn4 tab-btn active":"bton btn4 tab-btn "} id="defaultOpen">Shortlisted  <label className="comp-status mt-1" style={{background: "#FF8EBD"}}  id="del0">2</label>	</button>
@@ -331,60 +340,57 @@ const search =async (key:string)=>{
 									<input type="hidden" name="receiptId" value="<?php echo $row['receipt_id'] ?>"/>
 								
 									<div className="row mt-3">
-										{/* {pending?.map((x)=>{
-											return (
-												<div className="col-lg-6 shortCand">						
-													<div className="person-frame boarder-blue">
-														<div className="d-flex justify-content-between">
-															
-															<div className="rem-cand1" id="<?php echo $row['id'].'-'.$delNum ?>">
-																<img src="img/rounddel.svg"/>
-															</div>							
-														</div>
-														<div className="d-flex flex-row justify-content-between">
-															<div className="d-flex">
-																<div className="prof-img">
-																	<img src="img/user.svg" alt="pp" id="cand_pp"/>									
-																</div>	
-																<div className="prof-det pers-det">
-																	<label className="l-14 text-black">{x.personalInformation.name} {x.personalInformation.surname}</label>
-																	<p className="p-2" style={{marginTop: "-5px;"}}>{x.personalInformation.name} </p>
-																	<p className="p-2" style={{marginTop: "-15px;"}}>{x.personalInformation.country} </p>
-																	<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
-																		<label className="wtype">Remote</label>
-																	</div>
-																</div>
-															</div>					
-														</div>
-													</div>
+									
+										<div className="col-lg-6 shortCand">						
+											<div className="person-frame boarder-blue">
+												<div className="d-flex justify-content-between">
+													
+													<div className="rem-cand1" id="<?php echo $row['id'].'-'.$delNum ?>">
+														<img src="img/rounddel.svg"/>
+													</div>							
 												</div>
-											)
-										})} */}
-									<div className="col-lg-6 shortCand">						
-													<div className="person-frame boarder-blue">
-														<div className="d-flex justify-content-between">
-															
-															<div className="rem-cand1" id="<?php echo $row['id'].'-'.$delNum ?>">
-																<img src="img/rounddel.svg"/>
-															</div>							
+												<div className="d-flex flex-row justify-content-between">
+													<div className="d-flex">
+														<div className="prof-img">
+															<img src="img/user.svg" alt="pp" id="cand_pp"/>									
+														</div>	
+														<div className="prof-det pers-det">
+															<label className="l-14 text-black">.surname</label>
+															<p className="p-2" style={{marginTop: "-5px;"}}>.name </p>
+															<p className="p-2" style={{marginTop: "-15px;"}}>country </p>
+															<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
+																<label className="wtype">Remote</label>
+															</div>
 														</div>
-														<div className="d-flex flex-row justify-content-between">
-															<div className="d-flex">
-																<div className="prof-img">
-																	<img src="img/user.svg" alt="pp" id="cand_pp"/>									
-																</div>	
-																<div className="prof-det pers-det">
-																	<label className="l-14 text-black">.surname</label>
-																	<p className="p-2" style={{marginTop: "-5px;"}}>.name </p>
-																	<p className="p-2" style={{marginTop: "-15px;"}}>country </p>
-																	<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
-																		<label className="wtype">Remote</label>
-																	</div>
-																</div>
-															</div>					
-														</div>
-													</div>
+													</div>					
 												</div>
+											</div>
+										</div>
+										<div className="col-lg-6 shortCand">						
+											<div className="person-frame boarder-blue">
+												<div className="d-flex justify-content-between">
+													
+													<div className="rem-cand1" id="<?php echo $row['id'].'-'.$delNum ?>">
+														<img src="img/rounddel.svg"/>
+													</div>							
+												</div>
+												<div className="d-flex flex-row justify-content-between">
+													<div className="d-flex">
+														<div className="prof-img">
+															<img src="img/user.svg" alt="pp" id="cand_pp"/>									
+														</div>	
+														<div className="prof-det pers-det">
+															<label className="l-14 text-black">.surname</label>
+															<p className="p-2" style={{marginTop: "-5px;"}}>.name </p>
+															<p className="p-2" style={{marginTop: "-15px;"}}>country </p>
+															<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
+																<label className="wtype">Remote</label>
+															</div>
+														</div>
+													</div>					
+												</div>
+											</div>
+										</div>
 									</div>
 									<hr/>
 									<button type="button" id="<?php echo 'form'.$x; ?>" onClick={()=>{}} className="bton btn1 mr-0 d-block ml-auto invite">Invite</button>

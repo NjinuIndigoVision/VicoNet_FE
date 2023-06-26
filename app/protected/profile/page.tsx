@@ -112,7 +112,7 @@ function page() {
   };
   const getPersonnel = async function () {
     console.log("USER", loggedInUser);
-    const response = await Api.GET_Personnel(loggedInUser._id ?? "");
+    const response = await Api.GET_Personnel("64988f9e639324ebaa447512");
     console.log("DSSDS", response);
     return response as IPersonnel;
   };
@@ -133,7 +133,7 @@ function page() {
       console.log("saved.", savedUser);
       setUser(savedUser);
       dispatch(setPersonnel(savedUser));
-      await localStorage.setItem("currentPersonnel", JSON.stringify(savedUser));
+      await localStorage.removeItem("currentPersonnel")
     }
   };
 
@@ -193,8 +193,8 @@ function page() {
             <p> address..</p>
             <br />
             <p>
-              {user.personalInformation.province},
-              {user.personalInformation.country}
+              {user?.personalInformation?.province},
+              {user?.personalInformation?.country}
             </p>
           </>
         )}
@@ -207,7 +207,7 @@ function page() {
               <div>
                 <p className="text-lg font-bold">About</p>
                 <p className="mt-2 text-gray-700 text-sm">
-                  {user.personalInformation?.about}
+                  {user?.personalInformation?.about}
                 </p>
               </div>
               <AlertDialog>
@@ -219,7 +219,7 @@ function page() {
                     <AlertDialogTitle>Edit Bio</AlertDialogTitle>
                     <AlertDialogDescription>
                       <Textarea
-                        value={user.personalInformation.about}
+                        value={user.personalInformation?.about}
                         onChange={(e) => {
                           setUser((prev: any) => {
                             const usr = { ...prev };

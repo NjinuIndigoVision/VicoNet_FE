@@ -1,6 +1,7 @@
 import {
   ICompanyRegisterModel,
   ICompanyRegisterResponseModel,
+  IOrganisationViewModel,
 } from "../interfaces/company";
 import { IPersonnel, IUpdateProjectPersonnel } from "../interfaces/personnel";
 import {
@@ -14,9 +15,9 @@ import { IShortlistPersonnelRequest } from "./personnelActions";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
-import { IProjectView } from "../interfaces/project";
+import { ICreateProject, IProject, IProjectView } from "../interfaces/project";
 
-const url = "http://localhost:8080/api";
+export const url = "http://localhost:8080/api";
 // export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
 
 export const Api = {
@@ -130,28 +131,29 @@ export const Api = {
     return _response;
   },
 
-  GET_ProjectById: async (projectId: string): Promise<IResponseObject<IProjectView>> => {
+  GET_ProjectById: async (projectId: string): Promise<IProjectView> => {
     const response = await GET(`${url}/project/${projectId}`);
-    const _response = {
-      error: response.status != 200,
-      message: response.statusText,
-      data: response,
-      status: response.status,
-    } as IResponseObject<IProjectView>;
+    // const _response = {
+    //   error: response.status != 200,
+    //   message: response.statusText,
+    //   data: response,
+    //   status: response.status,
+    // } as IProjectView;
 
-    return _response;
+    return response;
   },
 
-  GET_ProjectsByOrganisationId: async (organisationId: string): Promise<IResponseObject<IProjectView>> => {
-    const response = await GET(`${url}/project/${organisationId}`);
-    const _response = {
-      error: response.status != 200,
-      message: response.statusText,
-      data: response,
-      status: response.status,
-    } as IResponseObject<IProjectView>;
+  GET_OrganisationById: async (organisationId: string): Promise<IOrganisationViewModel> => {
+    const response = await GET(`${url}/organisation/${organisationId}`);
+    console.log("resss", response)
+    // const _response = {
+    //   error: response.status != 200,
+    //   message: response.statusText,
+    //   data: response,
+    //   status: response.status,
+    // } as IResponseObject<IOrganisationViewModel>;
 
-    return _response;
+    return response;
   },
 
   GET_ShortlistPersonnel: async (staffId: string): Promise<IResponseObject<IPersonnel[]>> => {
@@ -189,6 +191,20 @@ export const Api = {
       data: response.data,
       status: response.status,
     } as IResponseObject<IPersonnel>;
+
+    return _response;
+  },
+
+  POST_Project: async (
+    payload: ICreateProject
+  ): Promise<IResponseObject<IProject>> => {
+    const response = await POST(`${url}/project`, payload);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response.data,
+      status: response.status,
+    } as IResponseObject<IProject>;
 
     return _response;
   },

@@ -1,5 +1,24 @@
 import { SrvRecord } from "dns";
+import { IProject } from "./project";
 
+export interface IOrganisationViewModel extends IOrganisation{
+  projects: IProject[],
+  organisation: IOrganisation
+}
+export interface IOrganisation {
+  _id?:string;
+  profile:string;
+  name:string;	
+  description:string;
+  status:string;		
+  currentPackage:string;		
+  renewalDate	:string;	
+  mobilePhone:string;	
+  _staff:string;
+  _projects:string;
+  _adminStaff:string;
+  
+}
 
 
 export interface ICompanyRegisterModel{

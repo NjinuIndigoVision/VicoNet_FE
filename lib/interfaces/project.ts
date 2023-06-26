@@ -1,3 +1,13 @@
+import { IPersonnel } from "./personnel";
+
+export interface ICreateProject{
+  _organisation:string;
+  _creatingUser:string;
+  name:string;
+  description:string;  
+}
+
+
 export interface IProjectView extends IProject {
   _uninvited:IPersonnel[];
   _pending:IPersonnel[];
