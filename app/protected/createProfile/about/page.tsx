@@ -31,7 +31,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
 import Cookies from "universal-cookie";
 import Select from "react-select";
-import { IOption, getOptionFromValue, provinces } from "@/lib/data";
+import { IOption, getOptionFromValue, provinces, roles } from "@/lib/data";
+import { da } from "date-fns/locale";
 function About() {
   const [about, setAbout] = useState("");
   const [country, setCountry] = useState("South Africa");
@@ -40,10 +41,8 @@ function About() {
   const [companyName, setCompanyName] = useState<string>("");
   const [jobTitle, setJobTitle] = useState<string>("");
   const [date, setDate] = useState<Date>();
-  const [currentJobResponsibilities, setCurrentJobResponsibilities] = useState<
-    IJobResponsibilities[]
-  >([]);
-  const [responsibility, setResponsibility] = useState("");
+
+  const [responsibility, setResponsibility] = useState<string[]>([]);
   const router = useRouter();
 
   const dispatch = useDispatch();
@@ -53,26 +52,10 @@ function About() {
     _loadData();
   }, []);
 
-  const addResponsibility = () => {
-    if (responsibility != "") {
-      setCurrentJobResponsibilities((current) => [
-        ...current,
-        { content: responsibility },
-      ]);
-      setResponsibility("");
-    }
-  };
-
-  const removeResponsibility = (idx: number) => {
-    setCurrentJobResponsibilities((current) =>
-      current.filter((_, i) => i !== idx)
-    );
-  };
-
  
   const _personnelFromState: any = useSelector(getPersonnel).personnel;
   const loggedInUser = cookies.get("viconet-user");
- 
+
   const _loadData = async () => {
     const data = await localStorage.getItem("currentPersonnel");
 
@@ -84,9 +67,11 @@ function About() {
       if (personnel.currentJob?.employer != undefined) {
         setIsWorking(true);
         setCompanyName(personnel.currentJob.employer!);
-        setCurrentJobResponsibilities(personnel.currentJob.responsibilities!);
+        // setCurrentJobResponsibilities(personnel.currentJob.responsibilities!);
+        setProvince(personnel.personalInformation.province??"")
+        setResponsibility(personnel.currentJob.responsibilities??[])
         setJobTitle(personnel.currentJob.jobTitle!);
-        // setDate(Date(personnel.currentJob.startDate!))//TODO: NK fix this
+        setDate(new Date(personnel.currentJob.startDate!))//TODO:  NK fix this
       }
     }
   };
@@ -98,7 +83,7 @@ function About() {
     const payload = {
       ..._personnelFromState,
       personalInformation: {
-        name: loggedInUser?.name,
+        name: loggedInUser?.firstName,
         about: about,
         surname: loggedInUser?.surname,
         dateOfBirth: "", //TODO: set this
@@ -110,7 +95,7 @@ function About() {
         employer: companyName,
         jobTitle,
         startDate: date?.toString(),
-        responsibilities: currentJobResponsibilities,
+        responsibilities: responsibility,
       } as IJobInformation,
     } as IPersonnel;
 
@@ -119,8 +104,27 @@ function About() {
     router.push("/protected/createProfile/education");
   };
 
-  console.log("rerere",_personnelFromState)
 
+  function handleSelectProvince(data:any) {
+
+    const _data = data as IOption;
+    setProvince(_data.value);
+  }
+
+
+  
+  function handleSelectDate(data:any) {
+    console.log("DASDA", data)
+    setDate(data)
+  }
+
+
+  function handleSelectResponsibility(data:any) {
+
+    const _data = data as IOption[];
+    setResponsibility(_data.map(x=>x.value));
+  }
+  console.log("rerere",_personnelFromState)
   //STORE
 
   return (
@@ -151,21 +155,14 @@ function About() {
 
           <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
             <Label htmlFor="name">Province</Label>
-            {/* <Input
-              value={province}
-              onChange={(e) => setProvince(e.target.value)}
-              type="select"
-              id="name"
-              placeholder="Province"
-            /> */}
              <Select
-                          options={provinces as any}
-                          placeholder="Search province"
-                          value={getOptionFromValue([province],provinces)[0]}
-                          onChange={()=>{setProvince}}
-                          isSearchable={true}
-                          
-                        />
+                options={provinces as any}
+                placeholder="Search province"
+                value={getOptionFromValue([province],provinces)[0]}
+                onChange={handleSelectProvince}
+                isSearchable={true}
+                
+              />
           </div>
 
           <div className="flex items-center space-x-2 my-5">
@@ -215,7 +212,7 @@ function About() {
                     <Calendar
                       mode="single"
                       selected={date}
-                      onSelect={setDate}
+                      onSelect={handleSelectDate}
                       initialFocus
                     />
                   </PopoverContent>
@@ -236,7 +233,7 @@ function About() {
               <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
                 <Label htmlFor="name">Role and Responsibility</Label>
                 <div className="flex flex-row justify-center space-x-2">
-                  <div className="flex-1">
+                  {/* <div className="flex-1">
                     <Input
                       value={responsibility}
                       onChange={(e) => setResponsibility(e.target.value)}
@@ -247,11 +244,22 @@ function About() {
                   </div>
                   <div className="">
                     <Button onClick={addResponsibility}>Add</Button>
-                  </div>
+                  </div> */}
+                  <div className="flex-1">
+                       <Select
+                        options={roles as any}
+                        placeholder="Select role / responsiblility"
+                        value={getOptionFromValue(responsibility,roles)}
+                        onChange={handleSelectResponsibility}
+                        isSearchable={true}
+                        isMulti
+                        
+                      />
+                    </div>
                 </div>
               </div>
 
-              {currentJobResponsibilities.map((item, idx) => (
+              {/* {currentJobResponsibilities.map((item, idx) => (
                 <div
                   key={idx}
                   className="flex flex-row justify-between my-5 w-full max-w-sm "
@@ -261,7 +269,7 @@ function About() {
                     Remove
                   </Button>
                 </div>
-              ))}
+              ))} */}
             </>
           )}
 

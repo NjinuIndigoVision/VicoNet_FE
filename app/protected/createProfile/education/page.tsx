@@ -8,7 +8,9 @@ import { getPersonnel, setPersonnel } from "@/lib/personnelSlice";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
+import Select from "react-select";
 import { useDispatch, useSelector } from "react-redux";
+import { IOption, degrees, getOptionFromValue } from "@/lib/data";
 
 export type EducationItemProp = {
   id: number;
@@ -62,22 +64,13 @@ function Educastion() {
   };
 
   const add = () => {
-    // const _education = [...education,{
-    //   dateCompleted: yearCompleted,
-    //   instituteName: institution,
-    //   qualification,
-    // } ]
-    // temp.push({
-    //   dateCompleted: yearCompleted,
-    //   instituteName: institution,
-    //   qualification,
-    // });
+    
     setEducation((current) => [
       ...current,
       {
         dateCompleted: yearCompleted,
         instituteName: institution,
-        qualification,
+        qualification: qualification
       },
     ]);
 
@@ -89,6 +82,14 @@ function Educastion() {
   const remove = (idx: number) => {
     setEducation((current) => current.filter((_, i) => i !== idx));
   };
+
+  
+  function handleSelectQualification(data:any) {
+
+    const _data = data as IOption;
+    setQualification(_data.value);
+  }
+
 
   return (
     <>
@@ -106,13 +107,22 @@ function Educastion() {
 
       <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
         <Label htmlFor="name">Qualification</Label>
-        <Input
+        {/* <Input
           value={qualification}
           onChange={(e) => setQualification(e.target.value)}
           type="text"
           id="name"
           placeholder="Qualification"
-        />
+        /> */}
+
+          <Select
+                options={degrees as any}
+                placeholder="Search Degree / Diploma"
+                value={getOptionFromValue(qualification==""?[]:[qualification],degrees)[0]}
+                onChange={handleSelectQualification}
+                isSearchable={true}
+                
+          />
       </div>
 
       <div className="grid w-full max-w-sm items-center mt-5 gap-1.5">
@@ -125,7 +135,7 @@ function Educastion() {
           placeholder="Year Completed"
         />
       </div>
-      <Button className="mt-5" onClick={add}>
+      <Button className="mt-5" onClick={add} disabled={yearCompleted=="" ||  institution=="" || qualification==""}>
         Add Education
       </Button>
 
@@ -137,7 +147,7 @@ function Educastion() {
           >
             <div>
               <p className="font-bold">{item.instituteName}</p>
-              <p className="text-sm">{item.qualification}</p>
+              <p className="text-sm">{getOptionFromValue([item.qualification],degrees)[0].label}</p>
               <p className="text-sm">{item.dateCompleted}</p>
             </div>
             <Button className="mt-5" onClick={() => remove(idx)}>

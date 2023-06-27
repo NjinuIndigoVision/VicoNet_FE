@@ -17,7 +17,7 @@ export interface IJobInformation{
   jobTitle?:string,
   startDate?:string,
   endDate?:string
-  responsibilities?:IJobResponsibilities[]
+  responsibilities?:string[]
 }
 
 export interface IEducationInformation{

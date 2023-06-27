@@ -151,7 +151,7 @@
     { "value": "s150", "label": "Data visualization methodologies" }
 ];
 
-export const courses =[
+export const degrees =[
     { "value": "c0", "label": "Degree: Bachelor of Science in Computer Science" },
     { "value": "c1", "label": "Degree: Bachelor of Engineering in Software Engineering" },
     { "value": "c2", "label": "Degree: Bachelor of Technology in Information Technology" },
@@ -252,6 +252,9 @@ export const courses =[
     { "value": "c97", "label": "Degree: Bachelor of Science in Test Execution" },
     { "value": "c98", "label": "Degree: Bachelor of Business Administration in Quality Assurance" },
     { "value": "c99", "label": "Degree: Bachelor of Science in Project Documentation" },
+]
+export const courses =[
+  
     { "value": "c100", "label": "Certification: AWS Certified Solutions Architect - Associate" },
     { "value": "c101", "label": "Certification: AWS Certified Developer - Associate" },
     { "value": "c102", "label": "Certification: AWS Certified SysOps Administrator - Associate" },

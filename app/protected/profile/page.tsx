@@ -43,17 +43,20 @@ import {
 import React, { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
 import Select from "react-select";
-import { courses, getOptionFromValue, roles, skills } from "@/lib/data";
+import { courses, getOptionFromValue, provinces, roles, skills } from "@/lib/data";
 import { useDispatch, useSelector } from "react-redux";
+import { INotification } from "@/lib/interfaces/notification";
 
 function page() {
   useEffect(() => {
     getUser();
+
   }, []);
 
   const [cv, setCV] = useState<Blob | undefined>();
   const [initials, setInitials] = useState("");
   const [user, setUser] = useState<IPersonnel>();
+  const [notifications, setNotifications] = useState<INotification[]>();
   const [currentJobResponsibilities, setCurrentJobResponsibilities] = useState<
     IJobResponsibilities[]
   >([]);
@@ -120,9 +123,10 @@ function page() {
   const getUser = async () => {
     //We'll replace this with an API call, also need to make this a SSR component
     const data = await localStorage.getItem("currentPersonnel");
-
+    console.log("STATE", user)
     if (data) {
       const usr: IPersonnel = JSON.parse(data);
+   
       setUser(usr);
       const ini =
         loggedInUser?.firstName?.substring(0, 1) ??
@@ -134,6 +138,7 @@ function page() {
       setUser(savedUser);
       dispatch(setPersonnel(savedUser));
       await localStorage.removeItem("currentPersonnel")
+      // GetUserNotifications(savedUser._id);
     }
   };
 
@@ -164,6 +169,11 @@ function page() {
     setUser(_user);
   }
 
+  async function GetUserNotifications(){
+    const notifications = await Api.GET_NotificationByPersonnelId(user?._id??"");
+    setNotifications(notifications)
+  }
+
   const deleteUser = async () => {
     const response = Api.POST_DeleteUser({
       email: loggedInUser.email,
@@ -190,15 +200,28 @@ function page() {
             </div>
             <p>{loggedInUser.email}</p>
             <br />
-            <p> address..</p>
+            {/* <p> address..</p> */}
             <br />
             <p>
-              {user?.personalInformation?.province},
-              {user?.personalInformation?.country}
+              {getOptionFromValue([user?.personalInformation?.province??""], provinces)[0]?.label} {" , "}
+               {user?.personalInformation?.country}
             </p>
           </>
         )}
+      <div>
+      <div className="flex flex-row mt-2">
+      
+              <p className="text-lg font-bold">
+              Notifications
+              </p>
+              <br />
+              {notifications?.map(x=><>
+              <p>{x.message}</p>
+              </>)}
+            </div>
       </div>
+      </div>
+ 
 
       <div className="p-10 border-gray-100 rounded-lg shadow-sm shadow-gray-300 flex flex-col flex-1">
         {user && (
@@ -350,10 +373,10 @@ function page() {
 
                 <div className="flex flex-row mt-2  ml-5 items-center">
                   <p className="mt-2 mx-5 text-gray-700 text-sm">
-                    {user.currentJob?.responsibilities?.map((item, i) => (
+                    {getOptionFromValue(user.currentJob?.responsibilities==undefined? [] : user.currentJob?.responsibilities, roles)?.map((item, i) => (
                       <p key={i} className="mt-2 mx-5 text-gray-700 text-sm">
                         {"- "}
-                        {item.content}
+                        {item.label}
                       </p>
                     ))}
                   </p>
@@ -407,10 +430,10 @@ function page() {
                         {moment(item.endDate).format("MMMM d, YYYY")} {")"}
                       </p>
 
-                      {item.responsibilities?.map((r, idx) => (
+                      {getOptionFromValue(item.responsibilities==undefined?[]:item.responsibilities, roles).map((r, idx) => (
                         <p className="mx-5 text-gray-400 text-xs">
                           {"- "}
-                          {r.content}
+                          {r.label}
                         </p>
                       ))}
                     </div>

@@ -17,6 +17,7 @@ import { GET, POST } from "./client";
 import { IResponseObject } from "./response";
 import { ICreateProject, IProject, IProjectView, IUpdateProjectPersonnel } from "../interfaces/project";
 import { IStaffViewModel } from "../interfaces/staff";
+import { INotification } from "../interfaces/notification";
 
 export const url = "http://localhost:8080/api";
 // export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
@@ -170,6 +171,29 @@ console.log("RESSS", response._doc);
     //   status: response.status,
     // } as IResponseObject<IOrganisationViewModel>;
 
+    return response;
+  },
+
+  
+  GET_NotificationByPersonnelId: async (personnelId: string): Promise<INotification[]> => {
+    const response = await GET(`${url}/notificationByUser/${personnelId}`);
+    return response;
+  },
+
+
+  GET_CloseNotification: async (notificationId:string): Promise<INotification[]> => {
+    
+    const response = await GET(`${url}/api/closeNotification/${notificationId}`);
+    return response;
+  },
+
+  GET_AcceptInvitation: async (personnelId:string, projectId:string): Promise<INotification[]> => {
+    const response = await GET(`${url}//api/acceptinvite/${personnelId}/${projectId}`);
+    return response;
+  },
+
+  GET_DeclineInvitation: async (personnelId:string, projectId:string): Promise<INotification[]> => {
+    const response = await GET(`${url}//api/declineinvite/${personnelId}/${projectId}`);
     return response;
   },
 

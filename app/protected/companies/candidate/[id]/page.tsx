@@ -131,7 +131,6 @@ function page() {
       setInitials(ini);
     } else {
       var savedUser = await getPersonnel();
-      console.log("saved.", savedUser);
       setUser(savedUser);
       dispatch(setPersonnel(savedUser));
       await localStorage.setItem("currentPersonnel", JSON.stringify(savedUser));
@@ -221,7 +220,7 @@ function page() {
                     <div className="">
                       <label
                         className="l-18-n text-white"
-                        for="pdf_cv"
+                        // for="pdf_cv"
                         style={{ margin: "10px 10px" }}
                       >
                         Download CV

@@ -46,29 +46,19 @@ function Experience() {
       endDate: `${_endDateSplit[1]} ${_endDateSplit[2]} ${_endDateSplit[3]}`,
     };
 
-    // let prev: IJobInformation[] = prevJobs;
-    // prev.push(job);
     const _jobs = [...prevJobs, job];
     setPrevJobs(_jobs);
+    setCompanyName("");
+    setStartDate(undefined);
+    setEndDate(undefined)
+    setJobTitle("")
   };
+;
 
   const remove = (idx: number) => {
     setPrevJobs((current) => current.filter((_, i) => i !== idx));
   };
 
-  // const save = async () => {
-  //   await localStorage.setItem("previousJobs", JSON.stringify(prevJobs));
-  //   router.push("/protected/createProfile/skills");
-  // };
-
-  // const loadData = async () => {
-  //   const data = await localStorage.getItem("previousJobs");
-
-  //   if (data) {
-  //     const jobs: IJobInformation[] = JSON.parse(data);
-  //     setPrevJobs(jobs);
-  //   }
-  // };
 
   const _loadData = async () => {
     const data = await localStorage.getItem("currentPersonnel");
@@ -80,9 +70,9 @@ function Experience() {
       jobs.length > 1 ? setIsWorking(true) : setIsWorking(false);
 
       setPrevJobs(jobs);
+      setIsWorking(jobs.length>0)
     }
   };
-  console.log("RWRE", _personnelFromState);
 
   const addPageDetailsToState = async () => {
     const payload = {
@@ -193,9 +183,9 @@ function Experience() {
               placeholder="Job Title"
             />
           </div>
-
+          <br/>
           <div className="">
-            <Button onClick={add}>Add</Button>
+            <Button disabled={jobTitle=="" || endDate== undefined || startDate==undefined || companyName==""} onClick={add}>Add</Button>
           </div>
 
           {prevJobs.map((item, idx) => (
