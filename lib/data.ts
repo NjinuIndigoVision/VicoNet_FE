@@ -309,14 +309,14 @@ export const courses =[
     ]
     
 export const roles =[
-    {"value": "team member", "label":"Team member"},
-    {"value": "team lead", "label":"Team Lead"},
-    {"value": "project manager", "label":"Project manager"},
+    {"value": "teammember", "label":"Team member"},
+    {"value": "teamlead", "label":"Team Lead"},
+    {"value": "projectmanager", "label":"Project manager"},
     {"value": "tester", "label":"Tester"},
-    {"value": "test manager", "label":"Test manager"},
-    {"value": "business analyst", "label":"Business analyst"},
-    {"value": "software architect", "label":"Software Architect"},
-    {"value": "software developer", "label":"Software Developer"}
+    {"value": "testmanager", "label":"Test manager"},
+    {"value": "businessanalyst", "label":"Business analyst"},
+    {"value": "softwarearchitect", "label":"Software Architect"},
+    {"value": "softwaredeveloper", "label":"Software Developer"}
 ]
 
 export const provinces =[

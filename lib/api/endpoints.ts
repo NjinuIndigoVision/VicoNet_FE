@@ -65,6 +65,21 @@ export const Api = {
     return _response;
   },
 
+  POST_UpdatePersonnel: async (
+    payload: IPersonnel, personnelId:string
+  ): Promise<IResponseObject<IPersonnel>> => {
+    const response = await POST(`${url}/personnel/${personnelId}`, payload);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response.data,
+      status: response.status,
+    } as IResponseObject<IPersonnel>;
+
+    return _response;
+  },
+
+
   POST_UpdateProjectPersonnel: async (
     payload: IUpdateProjectPersonnel
   ): Promise<IResponseObject<IProject>> => {
@@ -83,6 +98,17 @@ export const Api = {
 
   GET_Personnel: async (payload: string): Promise<IPersonnel> => {
     const response = await GET(`${url}/personnel/${payload}`);
+    const _response = {
+      error: response.status != 200,
+      message: response.statusText,
+      data: response,
+      status: response.status,
+    } as IResponseObject<IPersonnel>;
+
+    return response;
+  },
+  GET_PersonnelByUserId: async (payload: string): Promise<IPersonnel> => {
+    const response = await GET(`${url}/personnelByUserId/${payload}`);
     const _response = {
       error: response.status != 200,
       message: response.statusText,

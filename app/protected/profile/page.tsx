@@ -88,13 +88,15 @@ function page() {
     );
   };
 
+  const isUpdate =  user!=undefined && user?._id!=""
   const cookies = new Cookies();
   const moment = require("moment");
   const loggedInUser = cookies.get("viconet-user") as IUserResponseModel;
   const addPersonnel = async function () {
     const cvPayload = new FormData();
-    // cvPayload.append("cv", cv);
-    if (cv) {
+  
+    if(user?._id==undefined || user?._id==""){
+       if (cv) {
       cvPayload.append("cv", cv as Blob);
       const cvDoc = await uploadCV(cvPayload);
       const path = cvDoc.data.data.Location;
@@ -104,29 +106,59 @@ function page() {
         _user: loggedInUser._id,
         cvUrl: path,
       } as IPersonnel;
-      console.log("cvassaa", payload);
+      console.log("payload", payload);  
       const response = await Api.POST_AddPersonnel(payload);
-      setPersonnel(response);
+
+      setUser(response.data);
     } else {
       const payload = { ...user, _user: loggedInUser._id } as IPersonnel;
-      console.log("cvassaa", payload);
+      console.log("payload", payload);
       const response = await Api.POST_AddPersonnel(payload);
+      await localStorage.removeItem("currentPersonnel");
+      setUser(response.data);
     }
+    }else{
+      if (cv) {
+        cvPayload.append("cv", cv as Blob);
+        const cvDoc = await uploadCV(cvPayload);
+        const path = cvDoc.data.data.Location;
+  
+        const payload = {
+          ...user,
+          _user: loggedInUser._id,
+          cvUrl: path,
+        } as IPersonnel;
+        console.log("payload", payload);  
+        const response = await Api.POST_UpdatePersonnel(payload, user?._id??"");
+  
+        setUser(response.data);
+      } else {
+        const payload = { ...user, _user: loggedInUser._id } as IPersonnel;
+        console.log("payload", payload);
+        const response = await Api.POST_UpdatePersonnel(payload,user?._id??"");
+     
+        setUser(response.data);
+      }
+    }
+   
   };
+
   const getPersonnel = async function () {
     console.log("USER", loggedInUser);
-    const response = await Api.GET_Personnel("64988f9e639324ebaa447512");
+    const response = await Api.GET_PersonnelByUserId(loggedInUser._id??"");
     console.log("DSSDS", response);
     return response as IPersonnel;
   };
 
+
+
   const getUser = async () => {
     //We'll replace this with an API call, also need to make this a SSR component
     const data = await localStorage.getItem("currentPersonnel");
-    console.log("STATE", user)
+   
     if (data) {
       const usr: IPersonnel = JSON.parse(data);
-   
+
       setUser(usr);
       const ini =
         loggedInUser?.firstName?.substring(0, 1) ??
