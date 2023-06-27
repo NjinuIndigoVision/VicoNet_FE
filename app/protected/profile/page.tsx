@@ -68,6 +68,12 @@ function page() {
   const [about, setAbout] = useState("");
   const [currentJob, setCurrentJob] = useState<IJobInformation>();
 
+  const isUpdate =  user!=undefined && user?._id!=""
+  const cookies = new Cookies();
+  const moment = require("moment");
+  const loggedInUser = cookies.get("viconet-user") as IUserResponseModel;
+
+
   const saveCV = (e: any) => {
     setCV(e.target.files[0]);
   };
@@ -88,10 +94,6 @@ function page() {
     );
   };
 
-  const isUpdate =  user!=undefined && user?._id!=""
-  const cookies = new Cookies();
-  const moment = require("moment");
-  const loggedInUser = cookies.get("viconet-user") as IUserResponseModel;
   const addPersonnel = async function () {
     const cvPayload = new FormData();
   
@@ -144,9 +146,7 @@ function page() {
   };
 
   const getPersonnel = async function () {
-    console.log("USER", loggedInUser);
     const response = await Api.GET_PersonnelByUserId(loggedInUser._id??"");
-    console.log("DSSDS", response);
     return response as IPersonnel;
   };
 
@@ -170,7 +170,7 @@ function page() {
       setUser(savedUser);
       dispatch(setPersonnel(savedUser));
       await localStorage.removeItem("currentPersonnel")
-      // GetUserNotifications(savedUser._id);
+      await GetUserNotifications(savedUser._id);
     }
   };
 
@@ -201,11 +201,14 @@ function page() {
     setUser(_user);
   }
 
-  async function GetUserNotifications(){
-    const notifications = await Api.GET_NotificationByPersonnelId(user?._id??"");
+  async function GetUserNotifications(personnelId:string){
+    const notifications = await Api.GET_NotificationByPersonnelId(personnelId);
     setNotifications(notifications)
   }
 
+  function notificationReditect(){
+    router.push(`/protected/profile/notifications?id=${user?._id}`)
+  }
   const deleteUser = async () => {
     const response = Api.POST_DeleteUser({
       email: loggedInUser.email,
@@ -242,17 +245,17 @@ function page() {
         )}
       <div>
       <div className="flex flex-row mt-2">
-      
-              <p className="text-lg font-bold">
-              Notifications
-              </p>
-              <br />
-              {notifications?.map(x=><>
-              <p>{x.message}</p>
-              </>)}
-            </div>
+
+          <div className="d-flex flex-row ">
+            <label className="l-14 mr-2">Notifications</label>
+           
+          </div>
+       </div>
+       
+       <button onClick={notificationReditect} className="bton btn2" style={{width:"100%"}}>View notifications  <label className="p-14-n comp-status" id="numCand" style={{background: "rgb(255, 142, 189)", marginBottom: "0"}}>{notifications?.length}</label></button>
+
       </div>
-      </div>
+    </div>
  
 
       <div className="p-10 border-gray-100 rounded-lg shadow-sm shadow-gray-300 flex flex-col flex-1">

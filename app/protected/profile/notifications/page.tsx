@@ -32,7 +32,7 @@ const [personnelId, setPersonnelId] = useState<string>("");
 
 useEffect(() => {
 	console.log(searchParams.get("personnelId"));
-	const _personnelId = searchParams.get("personnelId");
+	const _personnelId = searchParams.get("id");
 	setPersonnelId(_personnelId??"");
 	GetUserNotifications(_personnelId??"");
   }, []);
@@ -50,13 +50,19 @@ async function GetUserNotifications(personnelId:string){
 
 async function AcceptInvite(projectId:string, notifcationId:string){
 	await Api.GET_AcceptInvitation(personnelId, projectId);
-	await Api.GET_CloseNotification(notifcationId);
+	await closeNotification(notifcationId)
 
 }
 
 async function DeclineInvite(projectId:string, notifcationId:string){
 	await Api.GET_AcceptInvitation(personnelId, projectId);
-	await Api.GET_CloseNotification(notifcationId);
+await closeNotification(notifcationId)
+}
+
+async function closeNotification(notificationId:string) {
+	await Api.GET_CloseNotification(notificationId);
+	setNotifications(notifications.filter(x=> x._id !=notificationId));
+	setNotificationHistory([...notificationHistory, ...notifications.filter(x=> x._id !=notificationId)])
 }
 
   return (

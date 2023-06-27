@@ -209,17 +209,17 @@ console.log("RESSS", response._doc);
 
   GET_CloseNotification: async (notificationId:string): Promise<INotification[]> => {
     
-    const response = await GET(`${url}/api/closeNotification/${notificationId}`);
+    const response = await GET(`${url}/closeNotification/${notificationId}`);
     return response;
   },
 
   GET_AcceptInvitation: async (personnelId:string, projectId:string): Promise<INotification[]> => {
-    const response = await GET(`${url}//api/acceptinvite/${personnelId}/${projectId}`);
+    const response = await GET(`${url}/acceptinvite/${personnelId}/${projectId}`);
     return response;
   },
 
   GET_DeclineInvitation: async (personnelId:string, projectId:string): Promise<INotification[]> => {
-    const response = await GET(`${url}//api/declineinvite/${personnelId}/${projectId}`);
+    const response = await GET(`${url}/declineinvite/${personnelId}/${projectId}`);
     return response;
   },
 
@@ -295,7 +295,7 @@ console.log("RESSS", response._doc);
   },
 
   POST_Search: async (payload: any) => {
-    const response = await POST(`${url}/searchPersonnel`, payload);
+    const response = await POST(`${url}/searchPersonnel`, {searchKey: payload});
     const _response = {
       error: response.status != 200,
       message: response.statusText,

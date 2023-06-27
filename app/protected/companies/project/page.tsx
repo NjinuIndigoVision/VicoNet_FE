@@ -21,26 +21,27 @@ import {
 import { Label } from "@radix-ui/react-label";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getOptionFromValue, skills } from "@/lib/data";
+import { IOption, courses, degrees, getOptionFromValue, provinces, roles, skills } from "@/lib/data";
 import { IStaffViewModel } from "@/lib/interfaces/staff";
 import Cookies from "universal-cookie";
 import { IUserResponseModel } from "@/lib/interfaces/user";
 import { rejects } from "assert";
-
+import { useSearchParams } from "next/navigation";
+import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
+import Link from "next/link";
 function page() {
 
 const [searchResult, setSearchResults] = useState<IPersonnel[]>();
 const [pending, setPending] = useState<IPersonnel[]>();
 const [accepted, setAccepted] = useState<IPersonnel[]>();
 const [declined, setDeclined] = useState<IPersonnel[]>();
+const [searchKeys, setSearchKeys] = useState<string[]>([]);
 
 const [project, setProject] = useState<IProjectView>();
 const [activeTab, setActiveTab] = useState<number>(0);
 const [staffUser, setStaffUser] = useState<IStaffViewModel>();
-
-const [selectedPersonnel, setSelectedPersonnel] = useState<string[]>([]);
-
-	
+const searchParams = useSearchParams()
 const cookies = new Cookies();
 const getProject =async (projectId:string)=>{
 
@@ -52,9 +53,9 @@ const getProject =async (projectId:string)=>{
 
 const scaffold=(response:IProjectView)=>{
 
-	setPending(response?._pending.filter(x=>x!=null));
-	setAccepted(response?._accepted.filter(x=>x!=null));
-	setDeclined(response?._declined.filter(x=>x!=null));
+	setPending(response?._pending?.filter(x=>x!=null));
+	setAccepted(response?._accepted?.filter(x=>x!=null));
+	setDeclined(response?._declined?.filter(x=>x!=null));
 	setProject(response);
 
 }
@@ -69,18 +70,18 @@ const getStaffUser =async (userId:string):Promise<IStaffViewModel>=>{
 
 useEffect(() => {
 
-	getProject("64988373fff3bcecf3399ed5");
+	const projectId = searchParams.get("id");
+	getProject(projectId??"");
 
 	const staffUser = cookies.get('viconet-user') as IUserResponseModel;
 	getStaffUser(staffUser._id??"").then(x=>{
-		setStaffUser(x);
+	setStaffUser(x);
 	})
 
   }, []);
   
-const search =async (key:string)=>{
-
-	const response = await Api.POST_Search(key);
+const search =async ()=>{
+	const response = await Api.POST_Search(searchKeys.join(","));
 	console.log("Res", response);
 	setSearchResults(response.data);
 }
@@ -96,16 +97,21 @@ const removeFromShortList =async (personnelId:string)=>{
 	setStaffUser(response as IStaffViewModel)
 }
 
+function handleSelectSearch(data:any) {
+    const _data = data as IOption[];
+    setSearchKeys(_data.map(x=>x.value));
+}
+
 
 const addToProject = async (personnelId:string)=>{
 
 	const request = {
-			projectId:"64988373fff3bcecf3399ed5",
+			projectId:project?._id,
 			personnelId:personnelId,
 			status:"0",
 			staffId:staffUser?.staff._id	
 		} as IUpdateProjectPersonnel
-
+		console.log("Res", request);
 	//send array. instead of looping: NK 
 	
 	const projectView = await Api.POST_UpdateProjectPersonnel(request) ;
@@ -114,11 +120,19 @@ const addToProject = async (personnelId:string)=>{
 	scaffold(_proj);
 	//remove from shortlist
 	
-	const newShortlisted = staffUser?.shortlisted.filter(x=>x._id.toString() != personnelId);
+	const newShortlisted = staffUser?.shortlisted?.filter(x=>x._id.toString() != personnelId);
 	const newStaff={...staffUser, shortlisted:newShortlisted} as IStaffViewModel;
 
 	setStaffUser(newStaff);
 }
+
+const allSearchValues = [
+	...skills,
+	...courses,
+	...provinces,
+	...roles,
+	...degrees
+]
 
   return (
 
@@ -154,14 +168,24 @@ const addToProject = async (personnelId:string)=>{
 								<AlertDialogDescription>
 								<div className="row" style={{width:"100%"}}>
 									<div className="col-md-8">
-									<Input
+									{/* <Input
 										className="bg-white"
 										placeholder="Job Title, Skills, Qualifications..."
+									/> */}
+
+									<CreatableSelect 
+										className="bg-white"
+										options={allSearchValues}
+										placeholder="Job Title, Skills, Qualifications..."
+										// value={getOptionFromValue(_skills, skills)}
+										onChange={handleSelectSearch}
+										isSearchable={true}
+										isMulti
 									/>
 									
 									</div>
 									<div className="col-md-2">
-									<Button onClick={()=>{search("")}} className="bg-[#E2186D]">
+									<Button onClick={()=>{search()}} className="bg-[#E2186D]">
 										Search
 									</Button>
 									</div>
@@ -173,7 +197,13 @@ const addToProject = async (personnelId:string)=>{
 									<input type="hidden" name="receiptId" value="<?php echo $row['receipt_id'] ?>"/>
 								
 									<div className="row mt-3">
-									{ searchResult?.map(x=>{ return(
+									{ searchResult?.length==0?
+									<>
+									<div className="col-lg-12 box hide show">
+												No search results..
+									</div>
+									</>:
+									searchResult?.map(x=>{ return(
 										<>
 										<div className="col-lg-6 box hide show">
 													
@@ -197,7 +227,7 @@ const addToProject = async (personnelId:string)=>{
 																
 															</div>
 															{/* <h1>Selected {selectedPersonnel.join(",")}</h1> */}
-															<a>
+															<Link href="">
 																{/* <button onClick={()=>{
 																console.log("curr",selectedPersonnel)
 
@@ -213,25 +243,29 @@ const addToProject = async (personnelId:string)=>{
 																	<label className="l-1)4 text-black">{x.personalInformation?.name} {x.personalInformation?.surname}</label>
 																	<p className="p-2" style={{marginTop: "-7px"}}></p>
 																	<div className="d-flex flex-row justify-content-between">
-																		<p className="p-2" style={{marginTop: "-15px"}}>{x.personalInformation?.name}</p>
+																		<p className="p-2" style={{marginTop: "-15px"}}>{getOptionFromValue([x.personalInformation?.province??""],provinces)[0].label }</p>
 																		<div style={{marginTop: "-17px"}}>
-																			<label className="wtype">Full time</label>
-																				<label className="wtype">Remote</label>
+																			{x.preferedWorkMethod==0 && <label className="wtype">Full time</label>}
+																			{x.preferedWorkMethod==1 && <label className="wtype">Part time</label>}
+																			{x.preferedWorkMethod==2 && <label className="wtype">Remote</label>}
 																			</div>
 																		</div>
 																	</div>
 																</div>
-															</a></div><a href="view-profile?id=79d687136cdee75335dbe8e5ba6cac00&amp;num=1" target="_blank">
+																</Link>
+																
+															</div>
+															<Link href="">
 															<div className="abtcand">
 																<div className="blog-flex">
 																	<div>
 																		<label className="roundfrm"><img src="img/skills-blue.svg"/></label>
 																	</div>
-																	<div className="ml-2"><label className="l-12">SKills</label>
+																	<div className="ml-2"><label className="l-12">Skills</label>
 																		<div style={{marginLeft:"13px",marginRight:" 13px"}}>
 																			<div className="row">
 																				{getOptionFromValue(x.keySkills??[], skills).map(y=>
-																				 <p>{y.label}</p>
+																				 <><p style={{width:"100%"}}>- {y.label}</p></>
 																				)}
 																			
 																		</div>
@@ -244,9 +278,14 @@ const addToProject = async (personnelId:string)=>{
 																		<label className="roundfrm"><img src="img/roles.svg"/></label>
 																	</div>
 																	<div className="ml-2"><label className="l-12">Roles</label>
-																		<div className="blog-flex roleslim">						
-																			<p className="p-12">							 		
-																			</p>								 	
+																		<div className="blog-flex roleslim">		
+																		{getOptionFromValue(x.currentJob?.responsibilities??[], roles).map(y=>
+																										
+																			<p className="">	
+																			{y.label}						 		
+																			</p>
+																		)}
+																										 	
 																		</div>
 																	</div>	
 																</div>
@@ -257,12 +296,12 @@ const addToProject = async (personnelId:string)=>{
 																	</div>
 																	<div className="ml-2"><label className="l-12">Qualifications</label>
 																		<div className="blog-flex mb-3">
-																				<p className="p-12">bsc information and knowledge systems  ,university of pretoria  </p>
+																				<p >bsc information and knowledge systems  ,university of pretoria  </p>
 																		</div>
 																	</div>	
 																</div>
 															</div>
-															</a>
+															</Link>
 														</div>																							
 												</div>
 										</>
@@ -343,11 +382,20 @@ const addToProject = async (personnelId:string)=>{
 															<img src="img/user.svg" alt="pp" id="cand_pp"/>									
 														</div>	
 														<div className="prof-det pers-det">
-															<label className="l-14 text-black"> {x.personalInformation.surname}</label>
-															<p className="p-2" style={{marginTop: "-5px"}}>{x.personalInformation.name} </p>
-															<p className="p-2" style={{marginTop: "-15px"}}>{x.personalInformation.country} </p>
+															<p className="p-2" > {x.personalInformation.name} {x.personalInformation.surname} 
+															{x.preferedWorkMethod==0 && <label className="wtype">Full time</label>}
+															{x.preferedWorkMethod==1 && <label className="wtype">Part time</label>}
+															{x.preferedWorkMethod==2 && <label className="wtype">Remote</label>}
+															</p>
+															
+														
+															<p className="l-14 text-black p-2" style={{marginTop: "-15px"}}>{getOptionFromValue([x.personalInformation?.province??""],provinces)[0].label } </p>	
+															<p className="l-14 text-black p-2" style={{marginTop: "-5px"}}>	{getOptionFromValue(x.keySkills??[], skills).map(y=>
+																				 `${y.label} | `
+																				)}
+																			 </p>
 															<div style={{marginTop:"-15px", marginLeft:"-7px"}}>
-																<label className="wtype">Remote</label>
+															
 															</div>
 														</div>
 													</div>					

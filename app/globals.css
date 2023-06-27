@@ -1521,6 +1521,7 @@ margin-bottom: 15px;
 cursor: pointer;
 overflow: hidden;
 box-shadow: 1px solid #fff;
+box-shadow: 1px 4px #EEEEFA;
 }
 .person-frame2:hover{
 	

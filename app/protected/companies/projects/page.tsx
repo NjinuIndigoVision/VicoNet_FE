@@ -24,53 +24,41 @@ import { useEffect, useState } from "react";
 import { IOrganisation, IOrganisationViewModel } from "@/lib/interfaces/company";
 import Cookies from "universal-cookie";
 import { IUserResponseModel } from "@/lib/interfaces/user";
+import Link from "next/link";
 
 function page() {
 	
 const [organisation, setOrganisation] = useState<IOrganisationViewModel>();
-const [accepted, setAccepted] = useState<IPersonnel[]>();
-const [declined, setDeclined] = useState<IPersonnel[]>();
 
-const [searchPersonnel, setSearchResults] = useState<IPersonnel[]>();
-const [activeTab, setActiveTab] = useState<number>(0);
 
 const [projectName, setProjectName] = useState<string>("");
 const [projectDescription, setProjectDescription] = useState<string>("");
 
 const cookies = new Cookies();
+const isLoggedIn = cookies.get('viconet-user') ;
+const loggedInObject = isLoggedIn as IUserResponseModel;
+const staffDetails = cookies.get('viconet-staff') ;
+
 const getOrg =async (organisation:string)=>{
-
 	const response = await Api.GET_OrganisationById(organisation);
-	
-	// if(response.error){
-	 	console.log("errwqwqwq",response)	
-	// }else{
-	 setOrganisation(response)
-	// }
-
+	setOrganisation(response)
 
 }
 
 
 useEffect(() => {
-	const isLoggedIn = cookies.get('viconet-user') ;
-	const loggedInObject = isLoggedIn as IUserResponseModel;
-	const staffDetails = cookies.get('viconet-staff') ;
-	console.log("loggedinusr", loggedInObject)
-	console.log("staffDetails", staffDetails)
 	
-	getOrg("649850f7357c74b4d756f570");
+	getOrg(staffDetails.staff._organisation);
 
   }, []);
   
 
   const addProject = async()=>{
-	console.log("errwqwqwq",organisation)
 	const payload = {
 		name:projectName,
 		description:projectDescription,
-		_organisation:"649850f7357c74b4d756f570",
-		_creatingUser:"649850f7357c74b4d756f571"
+		_organisation:staffDetails.staff._organisation,
+		_creatingUser:staffDetails.staff._id
 
 	} as ICreateProject;
 
@@ -81,23 +69,10 @@ useEffect(() => {
 		...organisation,
 		projects:[...currentProjects, payload]
 	}as IOrganisationViewModel
-	console.log("REDSADA", newOrg);
 	setOrganisation(newOrg); 
 
   }
-
-const search =async (key:string)=>{
-
-	const response = await Api.POST_Search({searchKey:key});
-
-	if(response.error){
-		alert("err")
-	}else{
-		setSearchResults(response.data)
-	}
-
-
-}
+  console.log("RENDER",organisation)
 
   return (
 
@@ -168,11 +143,60 @@ const search =async (key:string)=>{
 					<div className="corp-edit">	
 						<div className="row">
 							{
+								!(organisation?.projects!=undefined && organisation?.projects?.length>0)?
+								<>
+								<div className="col-lg-12 projtabs">
+								<div className="white-container" style={{background: "#EEEEFA", textAlign:"center"}}> No Projects, Create a new one</div>
+								<div style={{textAlign:"center"}}>
+									<AlertDialog>
+										<AlertDialogTrigger  style={{width:"100%"}}>
+										<button className="bton btn1" style={{width:"50%"}}>New project</button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogTitle>
+											Add new project
+											</AlertDialogTitle>
+											<hr/>
+											<AlertDialogDescription>
+											<div className="row" style={{width:"100%"}}>
+												<div className="col-md-12">
+												<Input
+													className="bg-white"
+													placeholder="Title"
+													onChange={(e)=>{setProjectName(e.target.value)}}
+												/>
+												
+												</div>
+											
+											</div>
+											<div className="row"  style={{width:"100%"}}>
+										
+											<div className="col-md-12 mt-5" >
+												<textarea rows={5} 
+													onChange={(e)=>{setProjectDescription(e.target.value)}}
+													className="bg-white" placeholder="Project description"/>
+												</div>
+
+											</div>
+											
+											</AlertDialogDescription>
+									
+										<AlertDialogFooter>
+											<AlertDialogCancel>Cancel</AlertDialogCancel>
+											<AlertDialogAction onClick={()=>{addProject()}}>Save</AlertDialogAction>
+										</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
+								</div>
+								</div>
+								
+								</>
+								:
 								organisation?.projects.map(x=>{
-									console.log("RENDER",x)
+									
 									return (<>
 											<div className="col-lg-4 projtabs">
-									<a href="project?id=vico-inv3">
+									<Link href={`/protected/companies/project?id=${x._id}`}>
 									<div className="white-container" style={{background: "#EEEEFA"}}>
 										<div className="record">
 											<div className="delproj" id="1vico-inv3"><img src="img/bin2.svg"/>
@@ -193,7 +217,7 @@ const search =async (key:string)=>{
 												</div>
 											</div>
 										</div>
-										</a>
+										</Link>
 									</div>
 									</>)
 								})
