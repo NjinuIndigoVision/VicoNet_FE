@@ -19,8 +19,8 @@ import { ICreateProject, IProject, IProjectView, IUpdateProjectPersonnel } from 
 import { IStaffViewModel } from "../interfaces/staff";
 import { INotification } from "../interfaces/notification";
 
-export const url = "http://localhost:8080/api";
-// export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
+// export const url = "http://localhost:8080/api";
+export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
 
 export const Api = {
   Base: url,
