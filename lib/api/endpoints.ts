@@ -3,7 +3,7 @@ import {
   ICompanyRegisterResponseModel,
   IOrganisationViewModel,
 } from "../interfaces/company";
-import { IPersonnel,  } from "../interfaces/personnel";
+import { IPersonnel } from "../interfaces/personnel";
 import {
   IActivateAccount,
   IDeleteUserModel,
@@ -15,12 +15,17 @@ import { IShortlistPersonnelRequest } from "./personnelActions";
 import { GET, POST } from "./client";
 
 import { IResponseObject } from "./response";
-import { ICreateProject, IProject, IProjectView, IUpdateProjectPersonnel } from "../interfaces/project";
+import {
+  ICreateProject,
+  IProject,
+  IProjectView,
+  IUpdateProjectPersonnel,
+} from "../interfaces/project";
 import { IStaffViewModel } from "../interfaces/staff";
 import { INotification } from "../interfaces/notification";
 
-// export const url = "http://localhost:8080/api";
-export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
+export const url = "http://localhost:8080/api";
+// export const url = "https://viconet-vercel-git-main-viconet.vercel.app/api";
 
 export const Api = {
   Base: url,
@@ -66,7 +71,8 @@ export const Api = {
   },
 
   POST_UpdatePersonnel: async (
-    payload: IPersonnel, personnelId:string
+    payload: IPersonnel,
+    personnelId: string
   ): Promise<IResponseObject<IPersonnel>> => {
     const response = await POST(`${url}/personnel/${personnelId}`, payload);
     const _response = {
@@ -78,7 +84,6 @@ export const Api = {
 
     return _response;
   },
-
 
   POST_UpdateProjectPersonnel: async (
     payload: IUpdateProjectPersonnel
@@ -94,7 +99,6 @@ export const Api = {
 
     return _response;
   },
-
 
   GET_Personnel: async (payload: string): Promise<IPersonnel> => {
     const response = await GET(`${url}/personnel/${payload}`);
@@ -183,13 +187,15 @@ export const Api = {
     //   data: response,
     //   status: response.status,
     // } as IProjectView;
-console.log("RESSS", response._doc);
+    console.log("RESSS", response._doc);
     return response;
   },
 
-  GET_OrganisationById: async (organisationId: string): Promise<IOrganisationViewModel> => {
+  GET_OrganisationById: async (
+    organisationId: string
+  ): Promise<IOrganisationViewModel> => {
     const response = await GET(`${url}/organisation/${organisationId}`);
-    console.log("resss", response)
+    console.log("resss", response);
     // const _response = {
     //   error: response.status != 200,
     //   message: response.statusText,
@@ -200,31 +206,47 @@ console.log("RESSS", response._doc);
     return response;
   },
 
-  
-  GET_NotificationByPersonnelId: async (personnelId: string): Promise<INotification[]> => {
+  GET_NotificationByPersonnelId: async (
+    personnelId: string
+  ): Promise<INotification[]> => {
     const response = await GET(`${url}/notificationByUser/${personnelId}`);
     return response;
   },
 
-
-  GET_CloseNotification: async (notificationId:string): Promise<INotification[]> => {
-    
+  GET_CloseNotification: async (
+    notificationId: string
+  ): Promise<INotification[]> => {
     const response = await GET(`${url}/closeNotification/${notificationId}`);
     return response;
   },
 
-  GET_AcceptInvitation: async (personnelId:string, projectId:string): Promise<INotification[]> => {
-    const response = await GET(`${url}/acceptinvite/${personnelId}/${projectId}`);
+  GET_AcceptInvitation: async (
+    personnelId: string,
+    projectId: string
+  ): Promise<INotification[]> => {
+    const response = await GET(
+      `${url}/acceptinvite/${personnelId}/${projectId}`
+    );
     return response;
   },
 
-  GET_DeclineInvitation: async (personnelId:string, projectId:string): Promise<INotification[]> => {
-    const response = await GET(`${url}/declineinvite/${personnelId}/${projectId}`);
+  GET_DeclineInvitation: async (
+    personnelId: string,
+    projectId: string
+  ): Promise<INotification[]> => {
+    const response = await GET(
+      `${url}/declineinvite/${personnelId}/${projectId}`
+    );
     return response;
   },
 
-  GET_ShortlistPersonnel: async (staffId: string, personnelId:string): Promise<IStaffViewModel> => {
-    const response = await GET(`${url}/staff/shortlist/${personnelId}/${staffId}`) as IStaffViewModel;
+  GET_ShortlistPersonnel: async (
+    staffId: string,
+    personnelId: string
+  ): Promise<IStaffViewModel> => {
+    const response = (await GET(
+      `${url}/staff/shortlist/${personnelId}/${staffId}`
+    )) as IStaffViewModel;
     // const _response = {
     //   error: response.status != 200,
     //   message: response.statusText,
@@ -235,8 +257,13 @@ console.log("RESSS", response._doc);
     return response;
   },
 
-  GET_UnShortlistPersonnel: async (staffId: string, personnelId:string): Promise<IStaffViewModel> => {
-    const response = await GET(`${url}/staff/removeshortlist/${personnelId}/${staffId}`) as IStaffViewModel; 
+  GET_UnShortlistPersonnel: async (
+    staffId: string,
+    personnelId: string
+  ): Promise<IStaffViewModel> => {
+    const response = (await GET(
+      `${url}/staff/removeshortlist/${personnelId}/${staffId}`
+    )) as IStaffViewModel;
     // const _response = {
     //   error: response.status != 200,
     //   message: response.statusText,
@@ -247,24 +274,24 @@ console.log("RESSS", response._doc);
     return response;
   },
 
-//  UpdateProjectPersonnel: async (upadateRequest: IUpdateProjectPersonnel): Promise<IResponseObject<IProject>> => {
-//     const response = await POST(`${url}/project/updateProjectPersonnel`, upadateRequest);
-//     const _response = {
-//       error: response.status != 200,
-//       message: response.statusText,
-//       data: response.data,
-//       status: response.status,
-//     } as IResponseObject<IProject>;
+  //  UpdateProjectPersonnel: async (upadateRequest: IUpdateProjectPersonnel): Promise<IResponseObject<IProject>> => {
+  //     const response = await POST(`${url}/project/updateProjectPersonnel`, upadateRequest);
+  //     const _response = {
+  //       error: response.status != 200,
+  //       message: response.statusText,
+  //       data: response.data,
+  //       status: response.status,
+  //     } as IResponseObject<IProject>;
 
-//     return _response;
-//   },
+  //     return _response;
+  //   },
 
-  
-  GET_StaffUserById: async (userId:string): Promise<IStaffViewModel> => {
-    const response = await GET(`${url}/staffuser/${userId}`) as IStaffViewModel; 
+  GET_StaffUserById: async (userId: string): Promise<IStaffViewModel> => {
+    const response = (await GET(
+      `${url}/staffuser/${userId}`
+    )) as IStaffViewModel;
     return response;
   },
-
 
   POST_Personnel: async (
     payload: IPersonnel
@@ -295,7 +322,9 @@ console.log("RESSS", response._doc);
   },
 
   POST_Search: async (payload: any) => {
-    const response = await POST(`${url}/searchPersonnel`, {searchKey: payload});
+    const response = await POST(`${url}/searchPersonnel`, {
+      searchKey: payload,
+    });
     const _response = {
       error: response.status != 200,
       message: response.statusText,
@@ -304,5 +333,5 @@ console.log("RESSS", response._doc);
     } as IResponseObject<IPersonnel[]>;
 
     return _response;
-  }
+  },
 };

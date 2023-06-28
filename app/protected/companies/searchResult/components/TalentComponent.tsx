@@ -1,97 +1,132 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { IEducationInformation, IJobInformation, IPersonnel } from "@/lib/interfaces/personnel";
+import {
+  IEducationInformation,
+  IJobInformation,
+  IPersonnel,
+} from "@/lib/interfaces/personnel";
 import { Briefcase, PenToolIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
-function TalentComponent({ props }: any) {
+function TalentComponent({ props, idx }: any) {
   const personnel = props as IPersonnel;
+  const rank = idx + 1;
+  const router = useRouter();
+
+  const goToProfile = () => {
+    router.push(`/protected/companies/candidate/${personnel._user}`);
+  };
   return (
-   
-      <div className="bg-white rounded-md w-96 h-80">
-        <div className="p-5">
-          <div className="flex flex-row justify-between">
-            <div className="flex flex-row items-center space-x-2">
-              <Avatar>
-                <AvatarFallback className="text-lg font-bold">
-                  {personnel?.personalInformation?.name?.substring(0, 1)}
-                  {personnel?.personalInformation?.surname?.substring(0, 1)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-bold text-lg">  {personnel?.personalInformation?.name}
-                  {personnel?.personalInformation?.surname}</p>
-                <p className="text-gray[300] text-sm">{props.position}</p>
-              </div>
+    <div className="col-lg-6 box hide show">
+      <div className="person-frame2">
+        <div className="rw1">
+          <div className="d-flex justify-content-between">
+            <label className="candnum">#{rank}</label>
+            <button className="bton btn4 addcand">Shortlist</button>
+          </div>
+          <div className="toprow">
+            <div className="prof-img">
+              <img src="/user.svg" />
             </div>
-            <div className="flex flex-col">
+
+            <div
+              onClick={goToProfile}
+              className="prof-det pers-det cursor-pointer"
+            >
+              <label className="l-14 text-black">
+                {personnel.personalInformation.name}{" "}
+                {personnel.personalInformation.surname}
+              </label>
+              <p
+                className="text-sm text-gray-500"
+                style={{ marginTop: "-7px" }}
+              >
+                {personnel.currentJob?.jobTitle}
+              </p>
+
               <div className="flex flex-row justify-between">
-                <div></div>
-                <div
-                  style={{ float: "right" }}
-                  className="px-2 flex items-center border-x-2 rounded-sm border-y-2 border-gray-500 w-16"
+                <p
+                  className="text-sm text-gray-500"
+                  style={{ marginTop: "-17px" }}
                 >
-                  <p style={{ fontSize: 10 }}>Shorlist</p>
+                  {personnel.personalInformation.country}
+                </p>
+                <div style={{ marginTop: "-17px" }}>
+                  {/* TODO: Add Work Methods */}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <div className="flex flex-row">
-                {props.previousWorkExperience?.map((w:IJobInformation) => (
-                  <div className="px-2 m-1 flex items-center bg-gray-500 rounded-lg">
-                    <p style={{ fontSize: 10 }} className="text-white">
-                      {w.employer}
-                    </p>
-                  </div>
-                ))}
+        <div className="abtcand">
+          <div className="blog-flex">
+            <div>
+              <label className="roundfrm">
+                <img src="/skills-blue.svg" />
+              </label>
+            </div>
+
+            <div className="ml-2">
+              <label className="l-12">Skills</label>
+
+              <div style={{ marginLeft: "13px", marginRight: "13px" }}>
+                <div className="row">
+                  {personnel.keySkills?.map((s) => (
+                    <p className="skillfrm text-sm text-gray-500">{s}</p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-row mt-5 space-x-3">
-            <PenToolIcon />
-            <div className="flex flex-col">
-              <p className="font-bold mb-2">Skills</p>
-              <div className="flex flex-row">
-                {props.skills?.map((w:string) => (
-                  <div className="px-2 m-1 flex items-center bg-gray-500 rounded-lg">
-                    <p style={{ fontSize: 10 }} className="text-white">
-                      {w}
-                    </p>
-                  </div>
-                ))}
+          <hr />
+
+          <div className="blog-flex">
+            <div>
+              <label className="roundfrm">
+                <img src="/roles.svg" />
+              </label>
+            </div>
+
+            <div className="ml-2">
+              <label className="l-12">Roles</label>
+
+              <div style={{ marginLeft: "13px", marginRight: "13px" }}>
+                <div className="row">
+                  {personnel.currentJob?.responsibilities?.map((s) => (
+                    <p className="text-sm">{s}, </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-          <hr className="my-2" />
-          <div className="flex flex-row mt-5 space-x-3">
-            <Briefcase />
-            <div className="flex flex-col">
-              <p className="font-bold mb-2">Roles</p>
-              <div className="flex flex-row">
-                {props.roles?.map((w:string) => (
-                  <div className="m-1">
-                    <p style={{ fontSize: 10 }}>{w}</p>
-                  </div>
-                ))}
-              </div>
+
+          <hr />
+
+          <div className="blog-flex">
+            <div>
+              <label className="roundfrm">
+                <img src="/edu-blue.svg" />
+              </label>
             </div>
-          </div>
-          <hr className="my-2" />
-          <div className="flex flex-row mt-5 space-x-3">
-            <Briefcase />
-            <div className="flex flex-col">
-              <p className="font-bold mb-2">Qualifications</p>
-              <div className="flex flex-row">
-                {props.qualifications?.map((w:IEducationInformation) => (
-                  <div className="m-1">
-                    <p style={{ fontSize: 10 }}>{w.qualification}</p>
-                  </div>
-                ))}
+
+            <div className="ml-2">
+              <label className="l-12">Qualifications</label>
+
+              <div style={{ marginLeft: "13px", marginRight: "13px" }}>
+                <div className="row">
+                  {personnel.education?.map((s) => (
+                    <p className="text-sm">{s.instituteName}, </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
   );
 }
 

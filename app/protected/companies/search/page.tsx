@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Api } from "@/lib/api/endpoints";
 import React, { useState } from "react";
 import TalentComponent from "./components/TalentComponent";
+import { setSearchQuery } from "../../../services/tempStore";
+import { useRouter } from "next/navigation";
 
 function Search() {
   const fakeData = [
@@ -58,6 +60,8 @@ function Search() {
   ];
 
   const [results, setResults] = useState(false);
+  const [query, setQuery] = useState("");
+  const router = useRouter();
   const search = async () => {
     setResults(true);
     try {
@@ -67,34 +71,37 @@ function Search() {
       console.log(e.message);
     }
   };
-  
-  return (
-    <div className="w-full h-full bg-[#27276C]">
-      <div className="px-10 py-32">
-        <div className="flex flex-row space-x-1">
-          <p className="text-3xl font-extrabold text-white">
-            Search For Suitable{" "}
-          </p>
-          <p className="text-3xl font-bold text-[#E2186D]"> Talent</p>
-        </div>
 
-        <div className="flex flex-row space-x-2 mt-5 max-w-lg">
-          <Input
-            className="bg-white"
-            placeholder="Job Title, Skills, Qualifications..."
-          />
-          <Button onClick={search} className="bg-[#E2186D]">
-            Search
-          </Button>
-        </div>
-        {results && (
-          <div className="mt-20">
-            <div className="grid grid-cols-2">
-              <TalentComponent props={fakeData[0]} />
-              <TalentComponent props={fakeData[1]} />
-            </div>
+  return (
+    <div className="blue-bg">
+      <div className="prof-container vertical-center">
+        <label className="mb-5 l-36-n text-white">
+          Search For Suitable <label className="text-purple"> Talents</label>{" "}
+        </label>
+
+        <div className="talent-search">
+          <div className="s_tal">
+            <input
+              type="text"
+              name="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              id="searchInput"
+              placeholder="Job Title, Qualifications, Skills, Location, Keywords..."
+              className="s_input"
+            />
           </div>
-        )}
+          <button
+            onClick={() => {
+              setSearchQuery(query);
+              router.push("/protected/companies/searchResult");
+            }}
+            className="bton btn1 search-btn"
+            id="talSearch"
+          >
+            search
+          </button>
+        </div>
       </div>
     </div>
   );

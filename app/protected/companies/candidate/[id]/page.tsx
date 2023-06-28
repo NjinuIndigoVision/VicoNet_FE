@@ -23,7 +23,6 @@ import {
 } from "@/lib/interfaces/personnel";
 import { IDeleteUserModel, IUserResponseModel } from "@/lib/interfaces/user";
 import { uploadCV } from "@/lib/personnelService";
-import { useRouter } from "next/navigation";
 import CreatableSelect from "react-select/creatable";
 import { setPersonnel } from "@/lib/personnelSlice";
 import { current } from "@reduxjs/toolkit";
@@ -46,8 +45,12 @@ import Cookies from "universal-cookie";
 import Select from "react-select";
 import { courses, getOptionFromValue, roles, skills } from "@/lib/data";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import { usePathname, useSearchParams } from "next/navigation";
 
 function page() {
+  const path = usePathname();
+
   useEffect(() => {
     getUser();
   }, []);
@@ -62,7 +65,6 @@ function page() {
   const [selectedOptions, setSelectedOptions] = useState();
   const dispatch = useDispatch();
 
-  const router = useRouter();
   const [about, setAbout] = useState("");
   const [currentJob, setCurrentJob] = useState<IJobInformation>();
 
@@ -119,22 +121,32 @@ function page() {
   };
 
   const getUser = async () => {
-    //We'll replace this with an API call, also need to make this a SSR component
-    const data = await localStorage.getItem("currentPersonnel");
-
-    if (data) {
-      const usr: IPersonnel = JSON.parse(data);
-      setUser(usr);
-      const ini =
-        loggedInUser?.firstName?.substring(0, 1) ??
-        "" + loggedInUser.surname?.substring(0, 1)!;
-      setInitials(ini);
-    } else {
-      var savedUser = await getPersonnel();
-      setUser(savedUser);
-      dispatch(setPersonnel(savedUser));
-      await localStorage.setItem("currentPersonnel", JSON.stringify(savedUser));
+    try {
+      console.log("GETTING IUSER");
+      const results = await Api.GET_PersonnelByUserId(
+        path.substring(path.lastIndexOf("/") + 1)
+      );
+      setUser(results);
+      console.log("USER", results);
+    } catch (e) {
+      console.log(e);
     }
+
+    // const data = await localStorage.getItem("currentPersonnel");
+
+    // if (data) {
+    //   const usr: IPersonnel = JSON.parse(data);
+    //   setUser(usr);
+    //   const ini =
+    //     loggedInUser?.firstName?.substring(0, 1) ??
+    //     "" + loggedInUser.surname?.substring(0, 1)!;
+    //   setInitials(ini);
+    // } else {
+    //   var savedUser = await getPersonnel();
+    //   setUser(savedUser);
+    //   dispatch(setPersonnel(savedUser));
+    //   await localStorage.setItem("currentPersonnel", JSON.stringify(savedUser));
+    // }
   };
 
   function handleSelectCourses(data: any) {
@@ -168,7 +180,6 @@ function page() {
     const response = Api.POST_DeleteUser({
       email: loggedInUser.email,
     } as IDeleteUserModel);
-    router.replace("/auth/login");
   };
 
   return (
@@ -186,16 +197,24 @@ function page() {
                 </label>
                 <div className="personal-info">
                   <div>
-                    <label className="l-14 pp-ini">RM</label>
+                    <label className="l-14 pp-ini">
+                      {user?.personalInformation.name?.substring(0, 1)}{" "}
+                      {user?.personalInformation.surname?.substring(0, 1)}
+                    </label>
                   </div>
-                  <p className="l-18">Rendani Murokolo</p>
-                  <p className="p-14-n">1998-06-12</p>
-                  <p className="p-14-n">rendaniconstatia@gmail.com</p>
+                  <p className="l-18">
+                    {user?.personalInformation.name}{" "}
+                    {user?.personalInformation.surname}
+                  </p>
+                  <p className="p-14-n">
+                    {user?.personalInformation.dateOfBirth}
+                  </p>
+                  <p className="p-14-n">njinu@gmail.com</p>
                   <label className="l-14">Address</label>
-                  <p className="p-14-n">6570/6 clayville 45</p>
+                  <p className="p-14-n">{user?.personalInformation.address}</p>
                   <p className="p-14-n"></p>
-                  <p className="p-14-n">Gauteng</p>
-                  <p className="p-14-n">South Africa</p>
+                  <p className="p-14-n">{user?.personalInformation.province}</p>
+                  <p className="p-14-n">{user?.personalInformation.country}</p>
                 </div>
 
                 <div
@@ -205,17 +224,13 @@ function page() {
                   <label className="wtype">Remote</label>
                 </div>
 
-                <a
-                  href="https://talent.viconetgroup.com/cv/1667407819.pdf"
-                  target="_blank"
-                  id="pdf_cv"
-                >
+                <a href={user?.cvUrl} target="_blank" id="pdf_cv">
                   <div
                     className="person-frame"
                     style={{ background: "#7878DA", display: "flex" }}
                   >
                     <div>
-                      <img src="img/pdf2.svg" />
+                      <img src="/pdf2.svg" />
                     </div>
                     <div className="">
                       <label
@@ -255,13 +270,18 @@ function page() {
                 <div className="col-lg-12">
                   <div className="d-flex">
                     <div>
-                      <label className="rounddiv">
-                        <img src="img/about-icon.svg" />
+                      <label className="rounddiv flex justify-center">
+                        <img src="/about-icon.svg" />
                       </label>
                     </div>
                     <div className="d-block">
-                      <label className="l-18-n">About Rendani Murokolo</label>
-                      <p className="p-14-n">This is the about</p>
+                      <label className="l-18-n">
+                        About {user?.personalInformation.name}{" "}
+                        {user?.personalInformation.surname}
+                      </label>
+                      <p className="p-14-n">
+                        {user?.personalInformation.about}
+                      </p>
                     </div>
                   </div>
                   <hr />
@@ -270,17 +290,23 @@ function page() {
                 <div className="col-lg-12">
                   <div className="d-flex">
                     <div>
-                      <label className="rounddiv">
-                        <img src="img/roles.svg" />
+                      <label className="rounddiv flex justify-center">
+                        <img src="/roles.svg" />
                       </label>
                     </div>
                     <div className="d-block">
                       <label className="l-18-n">
                         CURRENT ROLE & RESPONSIBITY
                       </label>
-                      <p className="p-14-n">Company Name : duduza united </p>
-                      <p className="p-14-n">Job Title : java dev </p>
-                      <p className="p-14-n">Starting Date : 2022-10-30 </p>
+                      <p className="p-14-n">
+                        Company Name : {user?.currentJob?.employer}{" "}
+                      </p>
+                      <p className="p-14-n">
+                        Job Title : {user?.currentJob?.jobTitle}{" "}
+                      </p>
+                      <p className="p-14-n">
+                        Starting Date : {user?.currentJob?.startDate}{" "}
+                      </p>
 
                       <div className="d-flex flex-row justify-content-between">
                         <span>
@@ -289,13 +315,17 @@ function page() {
                       </div>
                       <p style={{ marginTop: "-20px" }}>
                         <div className="d-flex record user_roles">
-                          <div>
-                            <div
-                              className="bullet"
-                              style={{ marginTop: "10px" }}
-                            ></div>
-                          </div>
-                          <label>testing</label>
+                          {user?.currentJob?.responsibilities?.map((r) => (
+                            <>
+                              <div>
+                                <div
+                                  className="bullet"
+                                  style={{ marginTop: "10px" }}
+                                ></div>
+                              </div>
+                              <label>{r}</label>
+                            </>
+                          ))}
                         </div>
                       </p>
                     </div>
@@ -306,12 +336,23 @@ function page() {
                 <div className="col-lg-12">
                   <div className="d-flex">
                     <div>
-                      <label className="rounddiv">
-                        <img src="img/p-w-e-b.svg" />
+                      <label className="rounddiv flex justify-center">
+                        <img src="/p-w-e-b.svg" />
                       </label>
                     </div>
                     <div className="d-block">
                       <label className="l-18-n">PREVIOUS WORK EXPERIENCE</label>
+                      {user?.previousWorkExperience?.map((e) => (
+                        <>
+                          <p className="p-14-n">Company Name : {e.employer} </p>
+                          <p className="p-14-n">Job Title : {e.jobTitle} </p>
+
+                          <p className="p-14-n">Start Date : {e.startDate} </p>
+
+                          <p className="p-14-n">End Date : {e.endDate} </p>
+                          <p> </p>
+                        </>
+                      ))}
                     </div>
                   </div>
                   <hr />
@@ -320,13 +361,13 @@ function page() {
                 <div className="col-lg-12">
                   <div className="d-flex">
                     <div>
-                      <label className="rounddiv">
-                        <img src="img/exp-blue.svg" />
+                      <label className="rounddiv flex justify-center">
+                        <img src="/exp-blue.svg" />
                       </label>
                     </div>
                     <div className="d-block">
                       <label className="l-18-n">YEARS OF EXPERIENCE</label>
-                      <p className="p-14-n"></p>
+                      <p className="p-14-n">{user?.yearsOfExperience}</p>
                     </div>
                   </div>
                   <hr />
@@ -335,31 +376,44 @@ function page() {
                 <div className="col-lg-12">
                   <div className="d-flex">
                     <div>
-                      <label className="rounddiv">
-                        <img src="img/edu-blue.svg" />
+                      <label className="rounddiv flex justify-center">
+                        <img src="/edu-blue.svg" />
                       </label>
                     </div>
                     <div className="d-block">
                       <label className="l-18-n">EDUCATION</label>
-                      <div>
-                        <label className="p-14">bsc IT</label>
-                        <div className="d-flex">
-                          <div>
-                            <div className="bullet mt-1"></div>
+                      {user?.education?.map((e) => (
+                        <div>
+                          <div className="d-flex">
+                            <div>
+                              <div className="bullet mt-1"></div>
+                            </div>
+                            <p className="p-14-n">
+                              <strong>Qualification : </strong>
+                              {e.qualification}
+                            </p>
                           </div>
-                          <p className="p-14-n">
-                            <strong>Institute : </strong>richfield
-                          </p>
-                        </div>
-                        <div className="d-flex">
-                          <div>
-                            <div className="bullet mt-1"></div>
+                          <div className="d-flex">
+                            <div>
+                              <div className="bullet mt-1"></div>
+                            </div>
+                            <p className="p-14-n">
+                              <strong>Institute : </strong>
+                              {e.instituteName}
+                            </p>
                           </div>
-                          <p className="p-14-n">
-                            <strong>Year completed : </strong>2019
-                          </p>
+                          <div className="d-flex">
+                            <div>
+                              <div className="bullet mt-1"></div>
+                            </div>
+                            <p className="p-14-n">
+                              <strong>Year completed : </strong>
+                              {e.dateCompleted}
+                            </p>
+                          </div>
+                          <p></p>
                         </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                   <hr />
@@ -367,36 +421,44 @@ function page() {
                 <div className="col-lg-12">
                   <div className="d-flex">
                     <div>
-                      <label className="rounddiv">
-                        <img src="img/key-course-blue.svg" />
+                      <label className="rounddiv flex justify-center">
+                        <img src="/key-course-blue.svg" />
                       </label>
                     </div>
                     <div className="d-block">
                       <label className="l-18-n">KEY COURSES</label>
 
-                      <div className="d-flex">
-                        <div>
-                          <div className="bullet"></div>
-                        </div>
-                        <div className="lft-text">
-                          <p className="move-up p-14-n">software dev</p>
-                        </div>
-                      </div>
+                      {user?.keyCourses?.map((c) => (
+                        <>
+                          <div className="d-flex">
+                            <div>
+                              <div className="bullet"></div>
+                            </div>
+                            <div className="lft-text">
+                              <p className="move-up p-14-n">{c}</p>
+                            </div>
+                          </div>
+                        </>
+                      ))}
                     </div>
                   </div>
                 </div>
                 <div className="col-lg-12">
                   <div className="d-flex">
                     <div>
-                      <label className="rounddiv">
-                        <img src="img/skills-blue.svg" />
+                      <label className="rounddiv flex justify-center">
+                        <img src="/skills-blue.svg" />
                       </label>
                     </div>
                     <div className="d-block">
                       <label className="l-18-n">KEY SKILLS </label>
                       <div className="s-around">
                         <div className="row">
-                          <p className="move-up p-14-n skillfrm">java</p>
+                          {user?.keySkills?.map((s) => (
+                            <>
+                              <p className="move-up p-14-n skillfrm">{s}</p>
+                            </>
+                          ))}
                         </div>
                       </div>
                     </div>
